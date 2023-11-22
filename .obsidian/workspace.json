@@ -1,0 +1,232 @@
+{
+  "main": {
+    "id": "88d4b17d6a86c3cb",
+    "type": "split",
+    "children": [
+      {
+        "id": "2f7cdbe38cbd0a6d",
+        "type": "tabs",
+        "children": [
+          {
+            "id": "2dfc1de21bc1b4e2",
+            "type": "leaf",
+            "pinned": true,
+            "state": {
+              "type": "markdown",
+              "state": {
+                "file": "README.md",
+                "mode": "source",
+                "source": false
+              },
+              "pinned": true
+            }
+          },
+          {
+            "id": "d0f8288668f03701",
+            "type": "leaf",
+            "state": {
+              "type": "markdown",
+              "state": {
+                "file": "docs/Julia examples.md",
+                "mode": "source",
+                "source": false
+              }
+            }
+          }
+        ],
+        "currentTab": 1
+      }
+    ],
+    "direction": "vertical"
+  },
+  "left": {
+    "id": "c6c6347657f7b484",
+    "type": "split",
+    "children": [
+      {
+        "id": "eb09344fe2b40567",
+        "type": "tabs",
+        "children": [
+          {
+            "id": "4397f3a8eb72ac78",
+            "type": "leaf",
+            "state": {
+              "type": "file-explorer",
+              "state": {
+                "sortOrder": "alphabetical"
+              }
+            }
+          },
+          {
+            "id": "37c1c4eb926d8784",
+            "type": "leaf",
+            "state": {
+              "type": "search",
+              "state": {
+                "query": "",
+                "matchingCase": false,
+                "explainSearch": false,
+                "collapseAll": false,
+                "extraContext": false,
+                "sortOrder": "alphabetical"
+              }
+            }
+          },
+          {
+            "id": "038948cb737078da",
+            "type": "leaf",
+            "state": {
+              "type": "bookmarks",
+              "state": {}
+            }
+          },
+          {
+            "id": "a956078f02894409",
+            "type": "leaf",
+            "state": {
+              "type": "git-view",
+              "state": {}
+            }
+          },
+          {
+            "id": "84ab996fe1ce2730",
+            "type": "leaf",
+            "state": {
+              "type": "git-history-view",
+              "state": {}
+            }
+          }
+        ]
+      }
+    ],
+    "direction": "horizontal",
+    "width": 200
+  },
+  "right": {
+    "id": "639ac4921454c6d4",
+    "type": "split",
+    "children": [
+      {
+        "id": "63f58457741cdc8e",
+        "type": "tabs",
+        "children": [
+          {
+            "id": "b41959e5365418be",
+            "type": "leaf",
+            "state": {
+              "type": "backlink",
+              "state": {
+                "file": "docs/Julia examples.md",
+                "collapseAll": false,
+                "extraContext": false,
+                "sortOrder": "alphabetical",
+                "showSearch": false,
+                "searchQuery": "",
+                "backlinkCollapsed": false,
+                "unlinkedCollapsed": true
+              }
+            }
+          },
+          {
+            "id": "74958f6ebfee2e36",
+            "type": "leaf",
+            "state": {
+              "type": "outgoing-link",
+              "state": {
+                "file": "docs/Julia examples.md",
+                "linksCollapsed": false,
+                "unlinkedCollapsed": true
+              }
+            }
+          },
+          {
+            "id": "ac0b709e288cf5ab",
+            "type": "leaf",
+            "state": {
+              "type": "tag",
+              "state": {
+                "sortOrder": "frequency",
+                "useHierarchy": true
+              }
+            }
+          },
+          {
+            "id": "1f2ba197aeedfc62",
+            "type": "leaf",
+            "state": {
+              "type": "outline",
+              "state": {
+                "file": "docs/Julia examples.md"
+              }
+            }
+          },
+          {
+            "id": "4b347cbae704ef85",
+            "type": "leaf",
+            "state": {
+              "type": "all-properties",
+              "state": {
+                "sortOrder": "frequency"
+              }
+            }
+          }
+        ],
+        "currentTab": 3
+      }
+    ],
+    "direction": "horizontal",
+    "width": 300,
+    "collapsed": true
+  },
+  "left-ribbon": {
+    "hiddenItems": {
+      "switcher:Open quick switcher": false,
+      "graph:Open graph view": false,
+      "canvas:Create new canvas": false,
+      "daily-notes:Open today's daily note": false,
+      "templates:Insert template": false,
+      "command-palette:Open command palette": false
+    }
+  },
+  "active": "4397f3a8eb72ac78",
+  "lastOpenFiles": [
+    "benchmarks/benchmarks.pdf",
+    "docs/Julia setup.md",
+    "docs/TRNmodel.md",
+    "docs/Synapse construction.md",
+    "docs/Run Script.md",
+    "docs/matlab/simParams.md",
+    "docs/matlab/Run_dsim.md",
+    "docs/matlab/poissonP.md",
+    "docs/matlab/Plotting tools.md",
+    "docs/matlab/Parallel pool.md",
+    "docs/matlab/Matlab setup.md",
+    "docs/matlab/Matlab Model.md",
+    "docs/matlab/ExtractData.md",
+    "docs/matlab/dsim.md",
+    "docs/Julia Model.md",
+    "README.md",
+    "docs/Julia examples.md",
+    "docs/Modules.md",
+    "docs/Matlab setup.md",
+    "src/matlab/extractData.m",
+    "src/matlab/adjustRin.m",
+    "src/matlab/model/adjustRin.m",
+    "src/RinCalcTRNnetwork.jl",
+    "src/RunTRNnetwork.jl~",
+    "src/RunTC_TRNnetwork.jl~",
+    "src/4913",
+    "src/RunTC_TRNnetwork.jl",
+    "src/TC_TRNnetwork.jl",
+    "src/TRN-TCnetwork.jl~",
+    "poissonP.md",
+    "Run_dsim.md",
+    "dsim.md",
+    "Julia setup.md",
+    "Matlab setup.md",
+    "Parallel pool.md",
+    "Code/Matlab/benchmark.jpg",
+    "simParams.md",
+    "Untitled.canvas"
+  ]
+}

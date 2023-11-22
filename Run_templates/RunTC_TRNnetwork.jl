@@ -1,0 +1,109 @@
+using Models.TC_TRNnetwork
+using OrdinaryDiffEq
+using MAT
+
+# constants
+
+# functions
+
+# main program
+function main()
+# Simulation//Run variables
+namesOfNeurons = ["TRN1","TRN2","TRN3","TRN4","TRN5","TRN6","TRN7","TRN8","TRN9",
+                  "TC1", "TC2", "TC3", "TC4", "TC5", "TC6", "TC7", "TC8", "TC9" ]
+numNeurons = length(namesOfNeurons)
+startTime  = 0.0
+endTime    = 1000.0
+dt = 0.1
+tspan = (startTime, endTime)
+
+## Initial conditions
+u0, per_neuron = initialconditions(numNeurons)
+
+## vars
+var_
+
+var_names = [" "]
+var_combos = allcombinations(var_)
+
+## Save//Run vars
+numBlocks = length(var_combos)
+reps = 150;
+
+
+savepath = joinpath(pwd(),"results")
+if ~isdir(savepath)
+    mkdir(savepath)
+
+    tmpBlock = 1
+    matwrite(joinpath(savepath,"tmpBlock.mat"),Dict("tmpBlock"=>tmpBlock))
+
+    D_vars = Dict("namesOfNeurons"=>namesOfNeurons,
+        "tspan"=>collect(tspan), "dt"=>dt,
+        "var_names"=>var_names, "reps"=>convert(Float64,reps),
+        "var_combos"=>[tup[k] for tup in var_combos, k in 1:length(var_names)])
+    matwrite(joinpath(savepath,"sim_vars.mat"),D_vars;compress = true)
+else
+    D = matread(joinpath(savepath,"tmpBlock.mat"))
+    tmpBlock = D["tmpBlock"]
+end
+
+
+# Start running blocks
+while tmpBlock <= numBlocks
+
+    ## deconstruct vars
+     = var_combos[tmpBlock] 
+
+    ## Initialize simParams
+    Params = Vector{simParams}(undef,reps)
+
+    for i = 1:reps
+        p = simParams(names=namesOfNeurons,n=numNeurons,per_neuron=per_neuron)
+
+        # Vars 
+        ## Inputs
+        for ii = 1:p.n
+            ### DC
+            p.bias[ii] = 0.3
+            ### noise
+            p.A[ii] = 
+            p.tA[ii] = poissonP(80,endTime)
+            p.AI[ii] = 
+            p.tAI[ii] = poissonP(20,endTime)
+        end
+
+        Params[i] = p
+    end
+
+    u = zeros(numNeurons,length(startTime:dt:endTime),reps)
+
+    @time Threads.@threads for i = 1:reps
+
+        p = Params[i]
+
+        prob = ODEProblem(dsim!,u0,tspan,p)
+
+        # Start sim
+        sol = solve(prob,VCAB3(),saveat=dt,save_idxs=1:p.per_neuron:length(u0))
+
+        u[:,:,i]=sol[:,:]
+    end
+
+    # Save Vm data
+    simResults = constructResults(u,Params)
+
+    matwrite(joinpath(savepath,"simResults$tmpBlock.mat"),
+             simResults;compress = true)
+
+    tmpBlock += 1
+    matwrite(joinpath(savepath,"tmpBlock.mat"),Dict("tmpBlock"=>tmpBlock))
+end
+
+
+nothing
+end #main
+
+
+main()
+

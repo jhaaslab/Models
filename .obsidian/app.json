@@ -1,0 +1,12 @@
+{
+  "attachmentFolderPath": "docs/attachments",
+  "spellcheck": false,
+  "showUnsupportedFiles": true,
+  "defaultViewMode": "preview",
+  "showLineNumber": false,
+  "readableLineLength": true,
+  "newFileLocation": "folder",
+  "newFileFolderPath": "docs",
+  "tabSize": 4,
+  "useMarkdownLinks": true
+}
