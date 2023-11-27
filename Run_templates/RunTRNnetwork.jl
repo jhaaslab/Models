@@ -2,14 +2,11 @@ using Models.TRNnetwork
 using OrdinaryDiffEq
 using MAT
 
-# constants
-
-# functions
 
 # main program
 function main()
 # Simulation//Run variables
-namesOfNeurons = ["TRN1","TRN2","TRN3","TRN4","TRN5","TRN6","TRN7","TRN8","TRN9"]
+namesOfNeurons = ["TRN$i" for i in 1:9]
 numNeurons = length(namesOfNeurons)
 startTime  = 0.0
 endTime    = 1000.0

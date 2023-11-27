@@ -1,43 +1,103 @@
 using Models.TRNmodel
 using OrdinaryDiffEq
-using Plots: plot, plot!
+using MAT
 
 # main program
 function main()
 # Simulation//Run variables
-namesOfNeurons = ["TRN1","TRN2"]
+namesOfNeurons = ["TRN1"]
 numNeurons = length(namesOfNeurons)
 startTime  = 0.0
-endTime    = 1000.0
+endTime    = 5000.0
 tspan = (startTime, endTime)
 dt = 0.1
 
 ## Initial conditions
-u0, per_neuron = initialconditions(numNeurons)
+u0, per_neuron = initialconditions(numNeurons,false)
 
-## Initialize simParams
-p = simParams(names=namesOfNeurons,n=numNeurons,per_neuron=per_neuron)
+## vars
+var_iDC = -2:0.01:0.3
 
-# Vars
-## inputs
-for ii = 1:p.n
-    ### DC
-    p.bias[ii] = 0.3
+var_names = ["iDC"]
+var_combos = var_iDC
 
-    p.iDC[ii]    = 1.0
-    p.iStart[ii] = 100.0
-    p.iStop[ii]  = 800.0;
+## Save//Run vars
+perBlk = 150
+numBlks = Int(ceil(length(var_combos)/perBlk))
+
+allBlks = [var_combos[(1:perBlk).+(perBlk*(i-1))] for i in 1:numBlks-1]
+allBlks = vcat(allBlks, [var_combos[1+(perBlk*(numBlks-1)):end]])
+
+#=
+savepath = joinpath(pwd(),"results")
+if ~isdir(savepath)
+    mkdir(savepath)
+
+    tmpBlk = 1
+    matwrite(joinpath(savepath,"tmpBlk.mat"),Dict("tmpBlk"=>tmpBlk))
+
+    D_vars = Dict("namesOfNeurons"=>namesOfNeurons,
+        "tspan"=>collect(tspan), "dt"=>dt,
+        "var_names"=>var_names, "perBlk"=>convert(Float64,perBlk),
+        "var_combos"=>[tup[k] for tup in var_combos, k in 1:length(var_names)])
+    matwrite(joinpath(savepath,"sim_vars.mat"),D_vars;compress = true)
+else
+    D = matread(joinpath(savepath,"tmpBlk.mat"))
+    tmpBlk = D["tmpBlk"]
+end
+=#
+tmpBlk = 1
+# Start running blocks
+while tmpBlk <= numBlks
+
+    Blk2run = allBlks[tmpBlk]
+    numSims = length(Blk2run)
+
+    ## Initialize simParams
+    Params = Vector{simParams}(undef,numSims)
+
+    for i = 1:numSims
+        p = simParams(names=namesOfNeurons,n=numNeurons,per_neuron=per_neuron)
+
+        ## deconstruct vars
+        iDC = Blk2run[i]
+
+        # Vars
+        ## Inputs
+        for ii = 1:p.n
+            ### DC
+            p.bias[ii] = iDC
+        end
+
+        Params[i] = p
+    end
+
+    u = zeros(numNeurons,length(startTime:dt:endTime),numSims)
+
+    Threads.@threads for i = 1:numSims
+
+        p = Params[i]
+
+        prob = ODEProblem(dsim!,u0,tspan,p)
+
+        # Start sim
+        sol = solve(prob,VCAB3(),saveat=dt,save_idxs=1:p.per_neuron:length(u0))
+
+        u[:,:,i]=sol[:,:]
+    end
+
+    # Save Vm data
+    simResults = constructResults(u,Params)
+    
+    #matwrite(joinpath(savepath,"simResults$tmpBlk.mat"),
+    #         simResults;compress = true)
+
+    tmpBlk += 1
+    #matwrite(joinpath(savepath,"tmpBlk.mat"),Dict("tmpBlk"=>tmpBlk))
 end
 
-prob = ODEProblem(dsim!, u0, tspan, p)
-
-# Start sim
-@time sol = solve(prob, VCAB3(), saveat=dt, save_idxs=1:p.per_neuron:length(u0))
+nothing
 end #main
 
-sol = main()
-
-# Plot Vm
-plot(sol, idxs = 1)
-plot(sol, idxs = 2)
+@time main()
 

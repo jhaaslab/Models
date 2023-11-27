@@ -37,11 +37,7 @@ function dsim!(du, u, p, t)
 
     # Inputs
     ## Applied current
-    if any((t.>p.iStart[i]) .* (t.<p.iStop[i]))
-        Iapp = -p.iDC[i]
-    else
-        Iapp = -p.bias[i]
-    end
+    Iapp = Iapp_f(p.iDC[i],t,(p.iStart[i],p.iStop[i]))
 
     # Channels
     ## Regular sodium

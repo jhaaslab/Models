@@ -36,9 +36,9 @@ open a terminal in your project folder and start julia:
 `julia` 
 
 enter pkg by typing `]`
-and type `activate Models`
-you should see a propt showing we are in the 'Models' project:
-`(Models) pkg >` 
+and type `activate .`
+you should see a propt showing we are in the project:
+`(PROJECT) pkg >` 
 type `instantiate` and hit enter, you should see a staus bar for precompilation. when that is done you can exit julia.
 
 To start Julia in the project environment start with the project flag:
@@ -53,7 +53,7 @@ open matlab and add the src/matlab folder to matlabs search path, do not add sub
 
 Keeping model code synced with the model repo:
 Add **this** repo as an upstream remote
-`git remote add upstream https://github.com/jhaaslab/models`
+`git remote add upstream https://github.com/jhaaslab/models.git`
 
 Syncing your fork
 open a terminal in your project folder and execute:

@@ -52,6 +52,7 @@
     gj::Matrix{Float64} = zeros(n,n)
 end
 
+
 function dsim!(du, u, p, t)
     for i = 1:p.n
     idx = p.per_neuron*(i-1)
@@ -59,26 +60,14 @@ function dsim!(du, u, p, t)
 
     # Inputs
     ## Applied current
-    if any((t.>p.iStart[i]) .* (t.<p.iStop[i]))
-        Iapp = -p.iDC[i]
-    else
-        Iapp = -p.bias[i]
-    end
+    Iapp = Iapp_f(p.iDC[i],t,(p.iStart[i],p.iStop[i]))
 
     ## External Synapses
     ### AMPAergic
-    if any((t.>p.tA[i]) .* (t.<p.tA[i].+2.0))
-        vpre = 0.0
-    else
-        vpre = -100.0
-    end
+    vpre = vpre_f(t,p.tA[i])
 
     ### GABAergic
-    if any((t.>p.tAI[i]) .* (t.<p.tAI[i].+2.0))
-        vpreI = 0.0
-    else
-        vpreI = -100.0
-    end
+    vpreI = vpre_f(t,p.tAI[i])
 
     # Channels
     ## Regular sodium
@@ -107,11 +96,7 @@ function dsim!(du, u, p, t)
     IAR = (p.g_ar*m_ar) * (v-p.E_ar)
     IL  = (p.g_L[i]) * (v-p.E_L)
 
-    if any((t.>p.GtACR_on[i]) .* (t.<p.GtACR_off[i]))
-        IGtACR = (p.g_GtACR) * (v-p.E_GtACR)
-    else
-        IGtACR = 0.0
-    end
+    IGtACR = GtACR_f(p.g_GtACR,t,(p.GtACR_on[i],p.GtACR_off[i])) * (v-p.E_GtACR)
 
     # Synapses
     ## Excitatory input

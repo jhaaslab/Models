@@ -11,7 +11,7 @@ using Statistics
 #------------------------------------------------------------
 
 include("RunUtils.jl")
-export allcombinations, constructResults, meanvm
+export allcombinations, constructResults, meanvm!
 
 #------------------------------------------------------------
 #Channel functions
@@ -19,6 +19,14 @@ export allcombinations, constructResults, meanvm
 
 include("Channels.jl")
 export Na_t, Na_p, K_rect, K_A, K2, Ca_T, AR
+
+#------------------------------------------------------------
+#Input functions
+#------------------------------------------------------------
+
+include("Inputs.jl")
+export Iapp_f, vpre_f, GtACR_f
+#------------------------------------------------------------
 
 #------------------------------------------------------------
 #Synapse functions
@@ -38,7 +46,7 @@ module TRNmodel
 using Models
 
 export dsim!, simParams, initialconditions
-export allcombinations, constructResults, meanvm
+export allcombinations, constructResults, meanvm!
 
 include("TRNmodel.jl")
 
@@ -50,7 +58,7 @@ module TRNnetwork
 using Models
 
 export dsim!, simParams, initialconditions, poissonP
-export allcombinations, constructResults, meanvm
+export allcombinations, constructResults, meanvm!
 
 include("TRNnetwork.jl")
 
@@ -62,7 +70,7 @@ module TC_TRNnetwork
 using Models
 
 export dsim!, simParams, initialconditions, poissonP
-export allcombinations, constructResults, meanvm
+export allcombinations, constructResults, meanvm!
 
 include("TC_TRNnetwork.jl")
 

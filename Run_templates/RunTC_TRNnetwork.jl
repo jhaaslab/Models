@@ -2,15 +2,11 @@ using Models.TC_TRNnetwork
 using OrdinaryDiffEq
 using MAT
 
-# constants
-
-# functions
 
 # main program
 function main()
 # Simulation//Run variables
-namesOfNeurons = ["TRN1","TRN2","TRN3","TRN4","TRN5","TRN6","TRN7","TRN8","TRN9",
-                  "TC1", "TC2", "TC3", "TC4", "TC5", "TC6", "TC7", "TC8", "TC9" ]
+namesOfNeurons = [["TRN$i" for i in 1:9]; ["TC$i" for i in 1:9]]
 numNeurons = length(namesOfNeurons)
 startTime  = 0.0
 endTime    = 1000.0
@@ -28,8 +24,7 @@ var_combos = allcombinations(var_)
 
 ## Save//Run vars
 numBlocks = length(var_combos)
-reps = 150;
-
+reps = 150
 
 savepath = joinpath(pwd(),"results")
 if ~isdir(savepath)
