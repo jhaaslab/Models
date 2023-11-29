@@ -1,8 +1,8 @@
-function Iapp_f(I,t,(Istart,Istop))
+function Iapp_f(bias,I,t,(Istart,Istop))
     if any((t.>=Istart) .* (t.<=Istop))
         return -I
     else
-        return 0.0
+        return -bias
     end
 end
 

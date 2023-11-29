@@ -1,7 +1,7 @@
 name = "Models"
 uuid = "d93e516b-cdf6-4941-872b-0848ac9e8f65"
 authors = ["Austin <AustinJMendoza@proton.me>"]
-version = "1.0.1"
+version = "1.0.2"
 
 [deps]
 MAT = "23992714-dd62-5051-b70f-ba57cb901cac"

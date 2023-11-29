@@ -65,7 +65,7 @@ function dsim!(du, u, p, t)
 
     # Inputs
     ## Applied current
-    Iapp = Iapp_f(p.iDC[i],t,(p.iStart[i],p.iStop[i]))
+    Iapp = Iapp_f(p.bias[i],p.iDC[i],t,(p.iStart[i],p.iStop[i]))
 
     ## External Synapses
     ### AMPAergic
