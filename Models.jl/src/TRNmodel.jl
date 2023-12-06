@@ -25,8 +25,8 @@
     # DC pulses # uA/cm^2
     bias::Vector{Float64} = zeros(n)
     iDC::Vector{Float64}  = zeros(n)
-    iStart::Vector{Any}   = zeros(n)
-    iStop::Vector{Any}    = zeros(n)
+    iStart::Vector{Vector{Float64}} = fill([0.0],n)
+    iStop::Vector{Vector{Float64}}  = fill([0.0],n)
 end
 
 

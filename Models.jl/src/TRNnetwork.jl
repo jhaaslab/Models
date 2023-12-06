@@ -29,12 +29,12 @@
     # DC pulses # uA/cm^2
     bias::Vector{Float64} = zeros(n)
     iDC::Vector{Float64}  = zeros(n)
-    iStart::Vector{Any}   = zeros(n)
-    iStop::Vector{Any}    = zeros(n)
+    iStart::Vector{Vector{Float64}} = fill([0.0],n)
+    iStop::Vector{Vector{Float64}}  = fill([0.0],n)
 
     # Silencing
-    GtACR_on::Vector{Any}  = zeros(n)
-    GtACR_off::Vector{Any} = zeros(n)
+    GtACR_on::Vector{Vector{Float64}}  = fill([0.0],n)
+    GtACR_off::Vector{Vector{Float64}} = fill([0.0],n)
 
     # Alpha/Beta Synapses # uA/cm^2
     Te1::Float64 = 5.0     #Exc rise time constant
@@ -43,10 +43,10 @@
     Ti2::Float64 = 35.0
 
     A::Vector{Float64}  = zeros(n)
-    tA::Vector{Any}     = zeros(n)
+    tA::Vector{Vector{Float64}} = fill([0.0],n)
 
     AI::Vector{Float64} = zeros(n)
-    tAI::Vector{Any}    = zeros(n)
+    tAI::Vector{Vector{Float64}} = fill([0.0],n)
 
     # Electrical Synapses # mS/cm^2
     gj::Matrix{Float64} = zeros(n,n)
