@@ -1,10 +1,9 @@
 name = "Models"
 uuid = "d93e516b-cdf6-4941-872b-0848ac9e8f65"
 authors = ["Austin <AustinJMendoza@proton.me>"]
-version = "1.0.3"
+version = "1.1.0"
 
 [deps]
-MAT = "23992714-dd62-5051-b70f-ba57cb901cac"
-OrdinaryDiffEq = "1dea7af3-3e70-54e6-95c3-0bf5283fa5ed"
+LinearAlgebra = "37e2e46d-f89d-539d-b4ee-838fcccc9c8e"
 Random = "9a3f8284-a2c9-5f02-9a11-845980a1fd5c"
 Statistics = "10745b16-79ce-11e8-11f9-7d13ad32a3b2"

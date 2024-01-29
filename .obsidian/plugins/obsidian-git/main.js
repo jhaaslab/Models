@@ -29274,6 +29274,7 @@ var DEFAULT_SETTINGS = {
   disablePush: false,
   pullBeforePush: true,
   disablePopups: false,
+  disablePopupsForNoChanges: false,
   listChangedFilesInMessageBody: false,
   showStatusBar: true,
   updateSubmodules: false,
@@ -29416,6 +29417,11 @@ function getDisplayPath(path2) {
   if (path2.endsWith("/"))
     return path2;
   return path2.split("/").last().replace(".md", "");
+}
+function formatMinutes(minutes) {
+  if (minutes === 1)
+    return "1 minute";
+  return `${minutes} minutes`;
 }
 
 // src/gitManager/gitManager.ts
@@ -29749,10 +29755,14 @@ var SimpleGit = class extends GitManager {
     dispatchEvent(new CustomEvent("git-head-update"));
     return res.summary.changes;
   }
-  async commit(message) {
+  async commit({
+    message,
+    amend
+  }) {
     this.plugin.setState(4 /* commit */);
     const res = (await this.git.commit(
       await this.formatCommitMessage(message),
+      amend ? ["--amend"] : [],
       (err) => this.onError(err)
     )).summary.changes;
     dispatchEvent(new CustomEvent("git-head-update"));
@@ -29942,10 +29952,15 @@ var SimpleGit = class extends GitManager {
     };
   }
   async getRemoteUrl(remote) {
-    return await this.git.remote(
-      ["get-url", remote],
-      (err, url) => this.onError(err)
-    ) || void 0;
+    try {
+      await this.git.remote(["get-url", remote]);
+    } catch (error) {
+      if (error.toString().contains(remote)) {
+        return void 0;
+      } else {
+        this.onError(error);
+      }
+    }
   }
   // https://github.com/kometenstaub/obsidian-version-history-diff/issues/3
   async log(file, relativeToVault = true, limit) {
@@ -31269,18 +31284,20 @@ var IsomorphicGit = class extends GitManager {
     try {
       await this.checkAuthorInfo();
       await this.stageAll({ status: status2, unstagedFiles });
-      return this.commit(message);
+      return this.commit({ message });
     } catch (error) {
       this.plugin.displayError(error);
       throw error;
     }
   }
-  async commit(message) {
+  async commit({
+    message
+  }) {
     try {
       await this.checkAuthorInfo();
       this.plugin.setState(4 /* commit */);
       const formatMessage = await this.formatCommitMessage(message);
-      const hadConflict = this.plugin.localStorage.getConflict() === "true";
+      const hadConflict = this.plugin.localStorage.getConflict();
       let parent = void 0;
       if (hadConflict) {
         const branchInfo = await this.branchInfo();
@@ -31293,7 +31310,7 @@ var IsomorphicGit = class extends GitManager {
           parent
         })
       );
-      this.plugin.localStorage.setConflict("false");
+      this.plugin.localStorage.setConflict(false);
       return;
     } catch (error) {
       this.plugin.displayError(error);
@@ -32167,7 +32184,9 @@ var ObsidianGitSettingsTab = class extends import_obsidian8.PluginSettingTab {
                 plugin.settings.autoSaveInterval
               );
               new import_obsidian8.Notice(
-                `Automatic ${commitOrBackup} enabled! Every ${plugin.settings.autoSaveInterval} minutes.`
+                `Automatic ${commitOrBackup} enabled! Every ${formatMinutes(
+                  plugin.settings.autoSaveInterval
+                )}.`
               );
             } else if (plugin.settings.autoSaveInterval <= 0) {
               plugin.clearAutoBackup() && new import_obsidian8.Notice(
@@ -32180,8 +32199,12 @@ var ObsidianGitSettingsTab = class extends import_obsidian8.PluginSettingTab {
         })
       );
       if (!plugin.settings.setLastSaveToLastCommit)
-        new import_obsidian8.Setting(containerEl).setName(`Auto Backup after stop editing any file`).setDesc(
-          `Requires the ${commitOrBackup} interval not to be 0. If turned on, do auto ${commitOrBackup} every ${plugin.settings.autoSaveInterval} minutes after stop editing any file. This also prevents auto ${commitOrBackup} while editing a file. If turned off, it's independent from the last change.`
+        new import_obsidian8.Setting(containerEl).setName(`Auto Backup after stopping file edits`).setDesc(
+          `Requires the ${commitOrBackup} interval not to be 0.
+                        If turned on, do auto ${commitOrBackup} every ${formatMinutes(
+            plugin.settings.autoSaveInterval
+          )} after stopping file edits.
+                        This also prevents auto ${commitOrBackup} while editing a file. If turned off, it's independent from the last change.`
         ).addToggle(
           (toggle) => toggle.setValue(plugin.settings.autoBackupAfterFileChange).onChange((value) => {
             plugin.settings.autoBackupAfterFileChange = value;
@@ -32221,7 +32244,9 @@ var ObsidianGitSettingsTab = class extends import_obsidian8.PluginSettingTab {
                   plugin.settings.autoPushInterval
                 );
                 new import_obsidian8.Notice(
-                  `Automatic push enabled! Every ${plugin.settings.autoPushInterval} minutes.`
+                  `Automatic push enabled! Every ${formatMinutes(
+                    plugin.settings.autoPushInterval
+                  )}.`
                 );
               } else if (plugin.settings.autoPushInterval <= 0) {
                 plugin.clearAutoPush() && new import_obsidian8.Notice(
@@ -32249,7 +32274,9 @@ var ObsidianGitSettingsTab = class extends import_obsidian8.PluginSettingTab {
                 plugin.settings.autoPullInterval
               );
               new import_obsidian8.Notice(
-                `Automatic pull enabled! Every ${plugin.settings.autoPullInterval} minutes.`
+                `Automatic pull enabled! Every ${formatMinutes(
+                  plugin.settings.autoPullInterval
+                )}.`
               );
             } else if (plugin.settings.autoPullInterval <= 0) {
               plugin.clearAutoPull() && new import_obsidian8.Notice("Automatic pull disabled!");
@@ -32285,14 +32312,14 @@ var ObsidianGitSettingsTab = class extends import_obsidian8.PluginSettingTab {
           plugin.saveSettings();
         })
       );
-      new import_obsidian8.Setting(containerEl).setName("{{date}} placeholder format").setDesc(
-        `Specify custom date format. E.g. "${DATE_TIME_FORMAT_SECONDS}"`
-      ).addText(
+      const datePlaceholderSetting = new import_obsidian8.Setting(containerEl).setName("{{date}} placeholder format").addText(
         (text2) => text2.setPlaceholder(plugin.settings.commitDateFormat).setValue(plugin.settings.commitDateFormat).onChange(async (value) => {
           plugin.settings.commitDateFormat = value;
           await plugin.saveSettings();
         })
       );
+      datePlaceholderSetting.descEl.innerHTML = `
+            Specify custom date format. E.g. "${DATE_TIME_FORMAT_SECONDS}. See <a href="https://momentjs.com">Moment.js</a> for more formats.`;
       new import_obsidian8.Setting(containerEl).setName("{{hostname}} placeholder replacement").setDesc("Specify custom hostname for every device.").addText(
         (text2) => {
           var _a2;
@@ -32388,9 +32415,19 @@ var ObsidianGitSettingsTab = class extends import_obsidian8.PluginSettingTab {
     ).addToggle(
       (toggle) => toggle.setValue(plugin.settings.disablePopups).onChange((value) => {
         plugin.settings.disablePopups = value;
+        this.display();
         plugin.saveSettings();
       })
     );
+    if (!plugin.settings.disablePopups)
+      new import_obsidian8.Setting(containerEl).setName("Hide notifications for no changes").setDesc(
+        "Don't show notifications when there are no changes to commit/push"
+      ).addToggle(
+        (toggle) => toggle.setValue(plugin.settings.disablePopupsForNoChanges).onChange((value) => {
+          plugin.settings.disablePopupsForNoChanges = value;
+          plugin.saveSettings();
+        })
+      );
     new import_obsidian8.Setting(containerEl).setName("Show status bar").setDesc(
       "Obsidian must be restarted for the changes to take affect"
     ).addToggle(
@@ -32413,7 +32450,7 @@ var ObsidianGitSettingsTab = class extends import_obsidian8.PluginSettingTab {
         plugin.saveSettings();
       })
     );
-    new import_obsidian8.Setting(containerEl).setName("Show changes files count in status bar").addToggle(
+    new import_obsidian8.Setting(containerEl).setName("Show the count of modified files in the status bar").addToggle(
       (toggle) => toggle.setValue(plugin.settings.changedFilesInStatusBar).onChange((value) => {
         plugin.settings.changedFilesInStatusBar = value;
         plugin.saveSettings();
@@ -32977,7 +33014,7 @@ var LineAuthoringSubscriber = class {
   async notifyLineAuthoring(id, la) {
     if (this.view === void 0) {
       console.warn(
-        `Obsidian Git: View is not defined for editor cache key. Unforeseen situation. id: ${id}`
+        `Git: View is not defined for editor cache key. Unforeseen situation. id: ${id}`
       );
       return;
     }
@@ -33727,7 +33764,7 @@ var LineAuthorProvider = class {
   }
   async trackChanged(file) {
     this.trackChangedHelper(file).catch((reason) => {
-      console.warn("Obsidian Git: Error in trackChanged." + reason);
+      console.warn("Git: Error in trackChanged." + reason);
       return Promise.reject(reason);
     });
   }
@@ -33736,7 +33773,7 @@ var LineAuthorProvider = class {
       return;
     if (file.path === void 0) {
       console.warn(
-        "Obsidian Git: Attempted to track change of undefined filepath. Unforeseen situation."
+        "Git: Attempted to track change of undefined filepath. Unforeseen situation."
       );
       return;
     }
@@ -33793,7 +33830,7 @@ var LineAuthoringFeature = class {
       const file = obsView == null ? void 0 : obsView.file;
       if (!this.lineAuthorInfoProvider) {
         console.warn(
-          "Obsidian Git: undefined lineAuthorInfoProvider. Unexpected situation."
+          "Git: undefined lineAuthorInfoProvider. Unexpected situation."
         );
         return;
       }
@@ -33828,10 +33865,7 @@ var LineAuthoringFeature = class {
       this.activateCodeMirrorExtensions();
       console.log(this.plg.manifest.name + ": Enabled line authoring.");
     } catch (e) {
-      console.warn(
-        "Obsidian Git: Error while loading line authoring feature.",
-        e
-      );
+      console.warn("Git: Error while loading line authoring feature.", e);
       this.deactivateFeature();
     }
   }
@@ -33972,6 +34006,7 @@ var StatusBar = class {
     this.messages = [];
     this.base = "obsidian-git-statusbar-";
     this.statusBarEl.setAttribute("aria-label-position", "top");
+    this.statusBarEl.setAttribute("data-tooltip-position", "top");
     addEventListener("git-refresh", this.refreshCommitTimestamp.bind(this));
   }
   displayMessage(message, timeout) {
@@ -34224,7 +34259,7 @@ async function getData(manager) {
     `remote.${remote}.url`
   );
   const [isGitHub, httpsUser, httpsRepo, sshUser, sshRepo] = remoteUrl.match(
-    /(?:^https:\/\/github\.com\/(.*)\/(.*)\.git$)|(?:^git@github\.com:(.*)\/(.*)\.git$)/
+    /(?:^https:\/\/github\.com\/(.*)\/(.*)\.git$)|(?:^[a-zA-Z]+@github\.com:(.*)\/(.*)\.git$)/
   );
   return {
     result: "success",
@@ -34282,10 +34317,10 @@ var LocalStorageSettings = class {
     return app.saveLocalStorage(this.prefix + "hostname", value);
   }
   getConflict() {
-    return app.loadLocalStorage(this.prefix + "conflict");
+    return app.loadLocalStorage(this.prefix + "conflict") == "true";
   }
   setConflict(value) {
-    return app.saveLocalStorage(this.prefix + "conflict", value);
+    return app.saveLocalStorage(this.prefix + "conflict", `${value}`);
   }
   getLastAutoPull() {
     return app.loadLocalStorage(this.prefix + "lastAutoPull");
@@ -37069,6 +37104,12 @@ function create_fragment(ctx) {
         /*side*/
         ctx[3]
       );
+      attr(
+        div3,
+        "data-tooltip-position",
+        /*side*/
+        ctx[3]
+      );
       attr(div3, "aria-label", div3_aria_label_value = /*diff*/
       ctx[0].vault_path);
       toggle_class(
@@ -37160,6 +37201,15 @@ function create_fragment(ctx) {
         attr(
           div3,
           "aria-label-position",
+          /*side*/
+          ctx2[3]
+        );
+      }
+      if (dirty & /*side*/
+      8) {
+        attr(
+          div3,
+          "data-tooltip-position",
           /*side*/
           ctx2[3]
         );
@@ -37330,6 +37380,12 @@ function create_else_block(ctx) {
         /*side*/
         ctx[5]
       );
+      attr(
+        div3,
+        "data-tooltip-position",
+        /*side*/
+        ctx[5]
+      );
       attr(div3, "aria-label", div3_aria_label_value = /*entity*/
       ctx[8].vaultPath);
       attr(div4, "class", "tree-item nav-folder");
@@ -37385,6 +37441,15 @@ function create_else_block(ctx) {
         attr(
           div3,
           "aria-label-position",
+          /*side*/
+          ctx[5]
+        );
+      }
+      if (!current || dirty & /*side*/
+      32) {
+        attr(
+          div3,
+          "data-tooltip-position",
           /*side*/
           ctx[5]
         );
@@ -38178,6 +38243,12 @@ function create_fragment3(ctx) {
         /*side*/
         ctx[5]
       );
+      attr(
+        div1,
+        "data-tooltip-position",
+        /*side*/
+        ctx[5]
+      );
       attr(div3, "class", "tree-item-self is-clickable nav-folder-title");
       attr(div4, "class", "tree-item nav-folder");
       toggle_class(
@@ -38252,6 +38323,15 @@ function create_fragment3(ctx) {
         attr(
           div1,
           "aria-label-position",
+          /*side*/
+          ctx2[5]
+        );
+      }
+      if (!current || dirty & /*side*/
+      32) {
+        attr(
+          div1,
+          "data-tooltip-position",
           /*side*/
           ctx2[5]
         );
@@ -39038,6 +39118,12 @@ function create_fragment5(ctx) {
         /*side*/
         ctx[3]
       );
+      attr(
+        div6,
+        "data-tooltip-position",
+        /*side*/
+        ctx[3]
+      );
       attr(div6, "aria-label", div6_aria_label_value = /*change*/
       ctx[0].vault_path);
       toggle_class(
@@ -39150,6 +39236,15 @@ function create_fragment5(ctx) {
         attr(
           div6,
           "aria-label-position",
+          /*side*/
+          ctx2[3]
+        );
+      }
+      if (dirty & /*side*/
+      8) {
+        attr(
+          div6,
+          "data-tooltip-position",
           /*side*/
           ctx2[3]
         );
@@ -39349,6 +39444,12 @@ function create_fragment6(ctx) {
         /*side*/
         ctx[1]
       );
+      attr(
+        div2,
+        "data-tooltip-position",
+        /*side*/
+        ctx[1]
+      );
       attr(div2, "aria-label", div2_aria_label_value = /*change*/
       ctx[0].vault_path);
       attr(main, "class", "tree-item nav-file svelte-1wbh8tp");
@@ -39414,6 +39515,15 @@ function create_fragment6(ctx) {
         attr(
           div2,
           "aria-label-position",
+          /*side*/
+          ctx2[1]
+        );
+      }
+      if (dirty & /*side*/
+      2) {
+        attr(
+          div2,
+          "data-tooltip-position",
           /*side*/
           ctx2[1]
         );
@@ -39585,6 +39695,12 @@ function create_fragment7(ctx) {
         /*side*/
         ctx[3]
       );
+      attr(
+        div5,
+        "data-tooltip-position",
+        /*side*/
+        ctx[3]
+      );
       attr(div5, "aria-label", div5_aria_label_value = /*change*/
       ctx[0].vault_path);
       toggle_class(
@@ -39694,6 +39810,15 @@ function create_fragment7(ctx) {
           ctx2[3]
         );
       }
+      if (dirty & /*side*/
+      8) {
+        attr(
+          div5,
+          "data-tooltip-position",
+          /*side*/
+          ctx2[3]
+        );
+      }
       if (dirty & /*change*/
       1 && div5_aria_label_value !== (div5_aria_label_value = /*change*/
       ctx2[0].vault_path)) {
@@ -39727,7 +39852,6 @@ function create_fragment7(ctx) {
   };
 }
 function instance7($$self, $$props, $$invalidate) {
-  let formattedPath;
   let side;
   let { change } = $$props;
   let { view } = $$props;
@@ -39783,11 +39907,6 @@ function instance7($$self, $$props, $$invalidate) {
       $$invalidate(8, manager = $$props2.manager);
   };
   $$self.$$.update = () => {
-    if ($$self.$$.dirty & /*change*/
-    1) {
-      $:
-        formattedPath = change.vault_path;
-    }
     if ($$self.$$.dirty & /*view*/
     2) {
       $:
@@ -39920,6 +40039,12 @@ function create_else_block3(ctx) {
         /*side*/
         ctx[6]
       );
+      attr(
+        div6,
+        "data-tooltip-position",
+        /*side*/
+        ctx[6]
+      );
       attr(div6, "aria-label", div6_aria_label_value = /*entity*/
       ctx[15].vaultPath);
       attr(div7, "class", "tree-item nav-folder");
@@ -39954,7 +40079,7 @@ function create_else_block3(ctx) {
       append2(div7, t6);
       current = true;
       if (!mounted) {
-        dispose = listen(div7, "click", click_handler_3);
+        dispose = listen(div7, "click", stop_propagation(click_handler_3));
         mounted = true;
       }
     },
@@ -39991,6 +40116,15 @@ function create_else_block3(ctx) {
         attr(
           div6,
           "aria-label-position",
+          /*side*/
+          ctx[6]
+        );
+      }
+      if (!current || dirty & /*side*/
+      64) {
+        attr(
+          div6,
+          "data-tooltip-position",
           /*side*/
           ctx[6]
         );
@@ -42490,7 +42624,7 @@ function instance9($$self, $$props, $$invalidate) {
           plugin.setState(0 /* idle */);
           return false;
         }
-        plugin.promiseQueue.addTask(() => plugin.gitManager.commit(commitMessage).then(() => {
+        plugin.promiseQueue.addTask(() => plugin.gitManager.commit({ message: commitMessage }).then(() => {
           if (commitMessage !== plugin.settings.commitMessage) {
             $$invalidate(2, commitMessage = "");
           }
@@ -43049,6 +43183,20 @@ var ObsidianGit = class extends import_obsidian30.Plugin {
         })
       )
     });
+    if (import_obsidian30.Platform.isDesktopApp) {
+      this.addCommand({
+        id: "commit-amend-staged-specified-message",
+        name: "Commit Amend",
+        callback: () => this.promiseQueue.addTask(
+          () => this.commit({
+            fromAutoBackup: false,
+            requestCustomMessage: true,
+            onlyStaged: true,
+            amend: true
+          })
+        )
+      });
+    }
     this.addCommand({
       id: "commit-staged-specified-message",
       name: "Commit staged with specific message",
@@ -43246,7 +43394,7 @@ var ObsidianGit = class extends import_obsidian30.Plugin {
     const length = 1e4;
     if (this.manifest.id === "obsidian-git" && import_obsidian30.Platform.isDesktopApp && !this.settings.showedMobileNotice) {
       new import_obsidian30.Notice(
-        "Obsidian Git is now available on mobile! Please read the plugin's README for more information.",
+        "Git is now available on mobile! Please read the plugin's README for more information.",
         length
       );
       this.settings.showedMobileNotice = true;
@@ -43254,7 +43402,7 @@ var ObsidianGit = class extends import_obsidian30.Plugin {
     }
     if (this.manifest.id === "obsidian-git-isomorphic") {
       new import_obsidian30.Notice(
-        "Obsidian Git Mobile is now deprecated. Please uninstall it and install Obsidian Git instead.",
+        "Git Mobile is now deprecated. Please uninstall it and install Git instead.",
         length
       );
     }
@@ -43593,11 +43741,12 @@ var ObsidianGit = class extends import_obsidian30.Plugin {
     fromAutoBackup,
     requestCustomMessage = false,
     onlyStaged = false,
-    commitMessage
+    commitMessage,
+    amend = false
   }) {
     if (!await this.isAllInitialized())
       return false;
-    let hadConflict = this.localStorage.getConflict() === "true";
+    let hadConflict = this.localStorage.getConflict();
     let changedFiles;
     let status2;
     let unstagedFiles;
@@ -43605,7 +43754,7 @@ var ObsidianGit = class extends import_obsidian30.Plugin {
       this.mayDeleteConflictFile();
       status2 = await this.updateCachedStatus();
       if (status2.conflicted.length == 0) {
-        this.localStorage.setConflict("false");
+        this.localStorage.setConflict(false);
         hadConflict = false;
       }
       if (fromAutoBackup && status2.conflicted.length > 0) {
@@ -43661,17 +43810,21 @@ var ObsidianGit = class extends import_obsidian30.Plugin {
       }
       let committedFiles;
       if (onlyStaged) {
-        committedFiles = await this.gitManager.commit(cmtMessage);
+        committedFiles = await this.gitManager.commit({
+          message: cmtMessage,
+          amend
+        });
       } else {
         committedFiles = await this.gitManager.commitAll({
           message: cmtMessage,
           status: status2,
-          unstagedFiles
+          unstagedFiles,
+          amend
         });
       }
       if (this.gitManager instanceof SimpleGit) {
         if ((await this.updateCachedStatus()).conflicted.length == 0) {
-          this.localStorage.setConflict("false");
+          this.localStorage.setConflict(false);
         }
       }
       let roughly = false;
@@ -43723,7 +43876,7 @@ var ObsidianGit = class extends import_obsidian30.Plugin {
     if (!await this.remotesAreSet()) {
       return false;
     }
-    const hadConflict = this.localStorage.getConflict() === "true";
+    const hadConflict = this.localStorage.getConflict();
     if (this.gitManager instanceof SimpleGit)
       await this.mayDeleteConflictFile();
     let status2;
@@ -43786,7 +43939,8 @@ var ObsidianGit = class extends import_obsidian30.Plugin {
     );
     if (file) {
       this.app.workspace.iterateAllLeaves((leaf) => {
-        if (leaf.view instanceof import_obsidian30.MarkdownView && leaf.view.file.path == file.path) {
+        var _a2;
+        if (leaf.view instanceof import_obsidian30.MarkdownView && ((_a2 = leaf.view.file) == null ? void 0 : _a2.path) == file.path) {
           leaf.detach();
         }
       });
@@ -43909,7 +44063,7 @@ var ObsidianGit = class extends import_obsidian30.Plugin {
       }
     }
     if (!this.timeoutIDBackup && !this.onFileModifyEventRef) {
-      const lastAutos = await this.loadLastAuto();
+      const lastAutos = this.loadLastAuto();
       if (this.settings.autoSaveInterval > 0) {
         const now2 = /* @__PURE__ */ new Date();
         const diff2 = this.settings.autoSaveInterval - Math.round(
@@ -43921,7 +44075,7 @@ var ObsidianGit = class extends import_obsidian30.Plugin {
   }
   async setUpAutos() {
     this.setUpAutoBackup();
-    const lastAutos = await this.loadLastAuto();
+    const lastAutos = this.loadLastAuto();
     if (this.settings.differentIntervalCommitAndPush && this.settings.autoPushInterval > 0) {
       const now2 = /* @__PURE__ */ new Date();
       const diff2 = this.settings.autoPushInterval - Math.round(
@@ -44044,12 +44198,12 @@ var ObsidianGit = class extends import_obsidian30.Plugin {
   }
   async handleConflict(conflicted) {
     this.setState(6 /* conflicted */);
-    this.localStorage.setConflict("true");
+    this.localStorage.setConflict(true);
     let lines;
     if (conflicted !== void 0) {
       lines = [
         "# Conflicts",
-        "Please resolve them and commit them using the commands `Obsidian Git: Commit all changes` followed by `Obsidian Git: Push`",
+        "Please resolve them and commit them using the commands `Git: Commit all changes` followed by `Git: Push`",
         "(This file will automatically be deleted before commit)",
         "[[#Additional Instructions]] available below file list",
         "",
@@ -44188,7 +44342,9 @@ I strongly recommend to use "Source mode" for viewing the conflicted files. For 
     var _a2;
     (_a2 = this.statusBar) == null ? void 0 : _a2.displayMessage(message.toLowerCase(), timeout);
     if (!this.settings.disablePopups) {
-      new import_obsidian30.Notice(message, 5 * 1e3);
+      if (!this.settings.disablePopupsForNoChanges || !message.startsWith("No changes")) {
+        new import_obsidian30.Notice(message, 5 * 1e3);
+      }
     }
     console.log(`git obsidian message: ${message}`);
   }

@@ -153,7 +153,9 @@
             "state": {
               "type": "all-properties",
               "state": {
-                "sortOrder": "frequency"
+                "sortOrder": "frequency",
+                "showSearch": false,
+                "searchQuery": ""
               }
             }
           }
@@ -177,23 +179,23 @@
   },
   "active": "2dfc1de21bc1b4e2",
   "lastOpenFiles": [
-    "docs/Julia Model.md",
-    "docs/Run Script.md",
-    "README.md",
-    "docs/TRNmodel.md",
-    "docs/matlab/Matlab Model.md",
-    "docs/Julia examples.md",
-    "benchmarks/benchmarks.pdf",
-    "docs/Julia setup.md",
-    "docs/Synapse construction.md",
-    "docs/matlab/simParams.md",
-    "docs/matlab/Run_dsim.md",
-    "docs/matlab/poissonP.md",
-    "docs/matlab/Plotting tools.md",
-    "docs/matlab/Parallel pool.md",
-    "docs/matlab/Matlab setup.md",
-    "docs/matlab/ExtractData.md",
     "docs/matlab/dsim.md",
+    "README.md",
+    "docs/matlab/Run_dsim.md",
+    "docs/Run Script.md",
+    "docs/Julia setup.md",
+    "docs/matlab/Matlab setup.md",
+    "docs/Julia Model.md",
+    "docs/matlab/Parallel pool.md",
+    "docs/matlab/Plotting tools.md",
+    "docs/matlab/simParams.md",
+    "docs/matlab/Matlab Model.md",
+    "docs/matlab/ExtractData.md",
+    "docs/Julia examples.md",
+    "docs/TRNmodel.md",
+    "docs/matlab/poissonP.md",
+    "benchmarks/benchmarks.pdf",
+    "docs/Synapse construction.md",
     "docs/Modules.md",
     "docs/Matlab setup.md",
     "src/matlab/extractData.m",

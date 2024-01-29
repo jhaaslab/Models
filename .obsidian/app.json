@@ -8,5 +8,6 @@
   "newFileLocation": "folder",
   "newFileFolderPath": "docs",
   "tabSize": 4,
-  "useMarkdownLinks": true
+  "useMarkdownLinks": true,
+  "vimMode": false
 }

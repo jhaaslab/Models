@@ -21,8 +21,8 @@ function constructResults(u, Params)
 end
 
 function meanvm!(vm,u,t,(t1,t2))
-    numNeurons = axes(u,1)
-    numSims    = axes(u,3)
+    #numNeurons = axes(u,1)
+    numSims = axes(u,3)
     vmdata = @views u[:,(t.>=t1) .* (t.<=t2),:]
 
     #vm = zeros(numNeurons,numSims)
