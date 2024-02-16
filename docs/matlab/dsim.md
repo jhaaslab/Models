@@ -91,7 +91,7 @@ end
 
 # Synapses
 
-Changes in synaptic conductance are calculated here while we iterate as the number of possible synapses increases with network size 
+Changes in synaptic conductance are calculated here while we iterate since the number of possible synapses increases with network size 
 ```matlab
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Synapses
 
@@ -192,7 +192,7 @@ function dm = K_rect(v, m)
     end
     dm = -(1/tau_m_kd) * (m - minf_kd);
 end
-->
+
 function [dm, dh]= K_A(v, m, h)
     minf_kt = 1/(1+exp((-v-60)/8.5));
     tau_m_kt = .185 + .5/(exp((v+35.8)/19.7) + exp((-v-79)/12.7));

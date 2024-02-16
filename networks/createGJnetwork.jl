@@ -22,8 +22,8 @@ namesOfNeurons = ["TRN$i" for i in 1:9]
 numNeurons = length(namesOfNeurons)
 allGc = 0.005:0.005:0.03
 numGc = length(allGc)
-#Gc_sig = 0
-numNets = 1
+Gc_sig = 0
+numNets = 50
 
 Rin_tgt = 6.239
 vm_tgt  = -70
@@ -44,19 +44,7 @@ Rin  = fill(zeros(numNeurons),(numGc,numNets))
 for m=1:numGc
     Gc = allGc[m]
     for n=1:numNets
-        #gj_tmp = constructGJ(numNeurons,Gc,Gc_sig);
-
-        # Ring
-        Gc = Gc/2
-        gj_tmp = [0 Gc 0 0 0 0 0 0 Gc
-                  Gc 0 Gc 0 0 0 0 0 0
-                  0 Gc 0 Gc 0 0 0 0 0
-                  0 0 Gc 0 Gc 0 0 0 0
-                  0 0 0 Gc 0 Gc 0 0 0
-                  0 0 0 0 Gc 0 Gc 0 0
-                  0 0 0 0 0 Gc 0 Gc 0
-                  0 0 0 0 0 0 Gc 0 Gc
-                  Gc 0 0 0 0 0 0 Gc 0]
+        gj_tmp = constructGJ(numNeurons,Gc,Gc_sig);
 
         #Estimate Rin adjust
         g_L_tmp = gL_func(vec(sum(gj_tmp,dims=1)'))

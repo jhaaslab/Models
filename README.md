@@ -9,9 +9,9 @@ Repo for all TRN and TC neuron models
 
 Git, if not installed. First time using git? -> [start here](https://docs.github.com/en/get-started/quickstart/set-up-git)
 
-Julia `ver 1.9+` -> [Julia setup](Julia%20setup.md) 
+Julia `ver 1.9+` -> [Julia setup](docs/Julia%20setup.md) 
 
-Matlab `R2023b`, latest release should work -> [Matlab setup](Matlab%20setup.md)
+Matlab `R2023b`, latest release should work -> [Matlab setup](docs/matlab/Matlab%20setup.md)
 
 
 ## Usage 
@@ -63,14 +63,12 @@ remove accidental pushing to upstream
 
 ## Julia project environment setup
 
-Julia manages packages by environment so even though we added packages in the global environment during [Julia setup](Julia%20setup.md) we will have to make sure model code dependencies are installed and precomiled for use in your project environment:
+Julia manages packages by environment so even though we added packages in the global environment during [Julia setup](docs/Julia%20setup.md) we will have to make sure model code dependencies are installed and precomiled for use in your project environment:
 
 Open a terminal in your project folder and start julia:
 `julia` 
 
 enter pkg by typing `]`
-
-and type `activate .`
 
 You should see a propt showing we are in the project:
 

@@ -8,10 +8,6 @@ Mac/linux terminal type:
 ```
 curl -fsSL https://install.julialang.org | sh
 ```
-Arch based systems use the AUR package:
-```
-pamac install juliaup
-```
 
 Model code was written as of Julia 1.9, if issues arise in future releases set the default to 1.9.X using Juliaup.
 
@@ -29,12 +25,15 @@ Files can be run by `include` 'ing the filename: >> `include("path/to/file.jl")`
 ## adding packages
 
 type `]` to enter pkg setup:
+
 necessary pkgs:
 
 ODE solver suite
+
 pkg> `add OrdinaryDiffEq`
 
 .mat file loading/saving
+
 pkg> `add MAT`
 
 optional:
@@ -70,4 +69,5 @@ on windows pwsh:
 
 on mac/linux:
 `export JULIA_NUM_THREADS="auto"`
- 
+
+To check number of threads being used in the current julia session type `Threads.nthreads()`

@@ -76,7 +76,7 @@ function dsim!(du, u, p, t)
     du[idx+12] = dm_ar
     end
 
-    nothing
+    return nothing
 end
 
 function initialconditions(numNeurons, bias = true)
@@ -90,7 +90,7 @@ function initialconditions(numNeurons, bias = true)
 
     u0 = repeat(u_init, numNeurons)
 
-    u0, per_neuron
+    return u0, per_neuron
 end
 
 

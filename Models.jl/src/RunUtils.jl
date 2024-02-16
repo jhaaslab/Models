@@ -17,7 +17,8 @@ function constructResults(u, Params)
     end
 
     simResults = Dict("simResults"=>D_results)
-    simResults
+
+    return simResults
 end
 
 function meanvm!(vm,u,t,(t1,t2))
@@ -34,7 +35,6 @@ function meanvm!(vm,u,t,(t1,t2))
         vm[:,i] = mean!(vm[:,i],vm_i)
     end
 
-    #vm
-    nothing
+    return nothing
 end
 

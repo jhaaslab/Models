@@ -42,10 +42,10 @@
     Ti1::Float64 = 5.0     #Inh
     Ti2::Float64 = 35.0
 
-    A::Vector{Float64}  = zeros(n)
+    A::Vector{Vector{Float64}}  = fill([0.0],n)
     tA::Vector{Vector{Float64}} = fill([0.0],n)
 
-    AI::Vector{Float64} = zeros(n)
+    AI::Vector{Vector{Float64}}  = fill([0.0],n)
     tAI::Vector{Vector{Float64}} = fill([0.0],n)
 
     # Electrical Synapses # mS/cm^2
@@ -64,10 +64,10 @@ function dsim!(du, u, p, t)
 
     ## External Synapses
     ### AMPAergic
-    vpre = vpre_f(t,p.tA[i])
+    A, vpre = ExtSyn_f(t,p.tA[i],p.A[i])
 
     ### GABAergic
-    vpreI = vpre_f(t,p.tAI[i])
+    AI, vpreI = ExtSyn_f(t,p.tAI[i],p.AI[i])
 
     # Channels
     ## Regular sodium
@@ -101,19 +101,14 @@ function dsim!(du, u, p, t)
     # Synapses
     ## Excitatory input
     du[idx+13] = p.Te1*K_syn(vpre)*(1.0-u[idx+13]) - p.Te2*u[idx+13]
-    Esyn1 = p.A[i]*u[idx+13] * (v-p.E_AMPA)
+    Esyn1 = A*u[idx+13] * (v-p.E_AMPA)
 
     ## Inhibitory input
     du[idx+14] = p.Ti1*K_syn(vpreI)*(1.0-u[idx+14]) - p.Ti2*u[idx+14]
-    Isyn1 = p.AI[i]*u[idx+14] * (v-p.E_GABA)
+    Isyn1 = AI*u[idx+14] * (v-p.E_GABA)
 
     ## Electrical synapses TRN
-    v_TRNs = zeros(p.n)
-    for ii=1:p.n
-        v_TRNs[ii] = u[p.per_neuron*(ii-1)+1]
-    end
-
-    Gsyn = sum(p.gj[:,i] .* (v.-v_TRNs))
+    Gsyn = Gsyn_f(v,u[1:p.per_neuron:end],p.gj[:,i])
 
     Summed_Isyn = Esyn1 + Isyn1 + Gsyn
 
@@ -132,7 +127,7 @@ function dsim!(du, u, p, t)
     du[idx+12] = dm_ar
     end
 
-    nothing
+    return nothing
 end
 
 function initialconditions(numNeurons, bias = true)
@@ -147,7 +142,7 @@ function initialconditions(numNeurons, bias = true)
 
     u0 = repeat(u_init, numNeurons)
 
-    u0, per_neuron
+    return u0, per_neuron
 end
 
 

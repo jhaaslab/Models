@@ -1,3 +1,4 @@
+
 function Na_t(v, m, h)
     minf_nat = 1.0/(1.0 + exp((-v - 38.0)/10.0))
     if v<= -30.0
@@ -9,7 +10,8 @@ function Na_t(v, m, h)
     tau_h_nat = 0.225 + 1.125/(1.0+exp((v+37.0)/15.0))
     dm = -(1.0/tau_m_nat) * (m - minf_nat)
     dh = -(1.0/tau_h_nat) * (h - hinf_nat)
-    dm, dh
+
+    return dm, dh
 end
 
 function Na_p(v, m)
@@ -20,7 +22,8 @@ function Na_p(v, m)
         tau_m_nap = 0.02 + 0.145*exp((-v-40.0)/10.0)
     end
     dm = -(1.0/tau_m_nap) * (m - minf_nap)
-    dm
+
+    return dm
 end
 
 function K_rect(v, m)
@@ -31,7 +34,8 @@ function K_rect(v, m)
         tau_m_kd = 0.25 + 4.35*exp((-v-10.0)/10.0)
     end
     dm = -(1.0/tau_m_kd) * (m - minf_kd)
-    dm
+
+    return dm
 end
 
 function K_A(v, m, h)
@@ -45,7 +49,8 @@ function K_A(v, m, h)
     end
     dm = -(1.0/tau_m_kt) * (m - minf_kt)
     dh = -(1.0/tau_h_kt) * (h - hinf_kt)
-    dm, dh
+
+    return dm, dh
 end
 
 function K2(v, m, h)
@@ -55,7 +60,8 @@ function K2(v, m, h)
     tau_h_k2 = 60.0 + 0.5/(exp((v - 1.33)/200.0) + exp((-v-130.0)/7.1))
     dm = -(1.0/tau_m_k2) * (m - minf_k2)
     dh = -(1.0/tau_h_k2) * (h - hinf_k2)
-    dm, dh
+
+    return dm, dh
 end
 
 function Ca_T(v, m, h)
@@ -65,14 +71,15 @@ function Ca_T(v, m, h)
     tau_h_ca_lts = 28.3 + 0.33/(exp((v+48.0)/4.0) + exp((-v-407.0)/50.0))
     dm = -(1.0/tau_m_ca_lts) * (m - minf_ca_lts)
     dh = -(1.0/tau_h_ca_lts) * (h - hinf_ca_lts)
-    dm, dh
+
+    return dm, dh
 end
 
 function AR(v, m)
     minf_ar = 1.0/(1.0+exp((v+75.0)/5.5))
     tau_m_ar = 1.0/(exp(-14.6  - 0.086*v) + exp(-1.87 + 0.07*v))
     dm = -(1.0/tau_m_ar) * (m - minf_ar)
-    dm
-end
 
+    return dm
+end
 

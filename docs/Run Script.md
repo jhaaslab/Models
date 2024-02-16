@@ -4,14 +4,12 @@ make a sim run directory in your project/simulations folder. be consise and spec
 
 copy a runscript template
 
-commit the initial script 
-	state in the commit comment sim initialization
-
 make changes to the script for your simulation
 
-run finalized script 
+run finalized script/extract data/make plots 
 
-commit the script after with a 'sim run finished' comment after the run was successful
+commit the script after the run was successful
+
 >[!warning]
->make sure .mat files were put into the .gitignore file if you see the simResults files in your staging area and **do not commit those simResults.mat files**
+>simResult .mat files should be ignored from the .gitignore file, if you see the simResults files in your staging area **do not commit those simResults.mat files** and check the .gitignore and that sim files are saved with the correct filenames.  
 

@@ -24,7 +24,7 @@ export Na_t, Na_p, K_rect, K_A, K2, Ca_T, AR
 #Input functions
 #------------------------------------------------------------
 include("Inputs.jl")
-export Iapp_f, vpre_f, GtACR_f
+export Iapp_f, ExtSyn_f, GtACR_f, Gsyn_f
 #------------------------------------------------------------
 
 #------------------------------------------------------------
