@@ -1,10 +1,10 @@
 {
   "minimal-style@@code-comment@@dark": "#7963C3",
   "minimal-style@@code-string@@dark": "#DE7D00",
-  "minimal-style@@code-function@@dark": "#F7F7F7",
+  "minimal-style@@code-function@@dark": "#C7C7C7",
   "minimal-style@@code-keyword@@dark": "#608DDA",
   "minimal-style@@code-value@@dark": "#A2C99F",
-  "minimal-style@@code-operator@@dark": "#F7F7F7",
+  "minimal-style@@code-operator@@dark": "#C7C7C7",
   "minimal-style@@pdf-invert-dark": false,
   "minimal-style@@inline-title-size": "1.5em",
   "minimal-style@@window-title-off": false,
@@ -18,8 +18,9 @@
   "minimal-style@@h1-variant": "normal",
   "minimal-style@@pdf-dark-opacity": 1,
   "minimal-style@@code-punctuation@@dark": "#89DDFF",
-  "minimal-style@@code-normal@@dark": "#F7F7F7",
-  "minimal-style@@code-property@@dark": "#F7F7F7",
-  "minimal-style@@code-tag@@dark": "#F7F7F7",
-  "minimal-style@@code-important@@dark": "#F7F7F7"
+  "minimal-style@@code-normal@@dark": "#C7C7C7",
+  "minimal-style@@code-property@@dark": "#C7C7C7",
+  "minimal-style@@code-tag@@dark": "#C7C7C7",
+  "minimal-style@@code-important@@dark": "#C7C7C7",
+  "minimal-style@@code-background@@dark": "#212121"
 }

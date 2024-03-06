@@ -20,8 +20,21 @@
               },
               "pinned": true
             }
+          },
+          {
+            "id": "2acfe4cbba10c2d2",
+            "type": "leaf",
+            "state": {
+              "type": "markdown",
+              "state": {
+                "file": "docs/Julia setup.md",
+                "mode": "preview",
+                "source": false
+              }
+            }
           }
-        ]
+        ],
+        "currentTab": 1
       }
     ],
     "direction": "vertical"
@@ -103,7 +116,7 @@
             "state": {
               "type": "backlink",
               "state": {
-                "file": "README.md",
+                "file": "docs/Julia setup.md",
                 "collapseAll": false,
                 "extraContext": false,
                 "sortOrder": "alphabetical",
@@ -120,7 +133,7 @@
             "state": {
               "type": "outgoing-link",
               "state": {
-                "file": "README.md",
+                "file": "docs/Julia setup.md",
                 "linksCollapsed": false,
                 "unlinkedCollapsed": true
               }
@@ -143,7 +156,7 @@
             "state": {
               "type": "outline",
               "state": {
-                "file": "README.md"
+                "file": "docs/Julia setup.md"
               }
             }
           },
@@ -177,36 +190,37 @@
       "command-palette:Open command palette": false
     }
   },
-  "active": "2dfc1de21bc1b4e2",
+  "active": "2acfe4cbba10c2d2",
   "lastOpenFiles": [
-    "docs/Matlab setup.md",
+    "Models.jl/Project.toml~",
+    "Run_templates/Run_simple.jl~",
+    "Run_templates/4913",
+    "Models.jl/src/TC_TRNnetwork.jl~",
+    "Models.jl/src/4913",
     "README.md",
-    "docs/matlab/Matlab setup.md",
-    "docs/Julia setup.md",
-    "networks/createTCnetwork.jl~",
+    "matlab/dataAnalysis.m~",
+    "docs/matlab/poissonP.md",
     "docs/matlab/dsim.md",
-    "docs/matlab/Run_dsim.md",
-    "docs/Run Script.md",
-    "docs/Julia Model.md",
-    "docs/matlab/Parallel pool.md",
     "docs/matlab/Plotting tools.md",
-    "docs/matlab/simParams.md",
+    "docs/matlab/Parallel pool.md",
+    "docs/matlab/Matlab setup.md",
     "docs/matlab/Matlab Model.md",
     "docs/matlab/ExtractData.md",
+    "docs/matlab/simParams.md",
+    "docs/matlab/Run_dsim.md",
     "docs/Julia examples.md",
-    "docs/TRNmodel.md",
-    "docs/matlab/poissonP.md",
-    "benchmarks/benchmarks.pdf",
+    "docs/Julia Model.md",
+    "docs/Julia setup.md",
+    "docs/Run Script.md",
     "docs/Synapse construction.md",
+    "docs/TRNmodel.md",
+    "docs/Matlab setup.md",
+    "networks/createTCnetwork.jl~",
+    "benchmarks/benchmarks.pdf",
     "docs/Modules.md",
     "src/matlab/extractData.m",
     "src/matlab/adjustRin.m",
     "src/matlab/model/adjustRin.m",
-    "src/RinCalcTRNnetwork.jl",
-    "src/RunTRNnetwork.jl~",
-    "src/RunTC_TRNnetwork.jl~",
-    "src/4913",
-    "src/RunTC_TRNnetwork.jl",
     "poissonP.md",
     "Run_dsim.md",
     "dsim.md",

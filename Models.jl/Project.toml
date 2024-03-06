@@ -1,7 +1,7 @@
 name = "Models"
 uuid = "d93e516b-cdf6-4941-872b-0848ac9e8f65"
 authors = ["Austin <AustinJMendoza@proton.me>"]
-version = "1.2.0"
+version = "1.2.1"
 
 [deps]
 LinearAlgebra = "37e2e46d-f89d-539d-b4ee-838fcccc9c8e"

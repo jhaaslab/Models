@@ -116,8 +116,7 @@ function dsim!(du, u, p, t)
         ## Excitatory input TC
         Esyn2=0.0
         for ii=1:p.nTC
-        du[idx+14+ii] = p.Te1*K_syn(u[p.per_neuron*(ii+(div(p.n,2)-1))+1])
-                        *(1.0-u[idx+14+ii]) - p.Te2*u[idx+14+ii]
+        du[idx+14+ii] = p.Te1*K_syn(u[p.per_neuron*(ii+p.nTC-1)+1])*(1.0-u[idx+14+ii]) - p.Te2*u[idx+14+ii]
         Esyn2 += p.A_TC[ii,i]*u[idx+14+ii] * (v-p.E_AMPA)
         end
 
@@ -130,9 +129,8 @@ function dsim!(du, u, p, t)
         ## Inhibitory input TRN
         Isyn2=0.0
         for ii=1:p.nTRN
-        du[idx+14+ii] = p.Ti1*K_syn(u[p.per_neuron*(ii-1)+1])
-                        *(1.0-u[idx+14+ii]) - p.Ti2*u[idx+14+ii]
-        Isyn2 += p.AI_TRN[ii,i-div(p.n,2)]*u[idx+14+ii] * (v-p.E_GABA)
+        du[idx+14+ii] = p.Ti1*K_syn(u[p.per_neuron*(ii-1)+1])*(1.0-u[idx+14+ii]) - p.Ti2*u[idx+14+ii]
+        Isyn2 += p.AI_TRN[ii,i-p.nTRN]*u[idx+14+ii] * (v-p.E_GABA)
         end
 
         Summed_Isyn = Esyn1 + Isyn1 + Isyn2
