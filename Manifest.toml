@@ -1006,7 +1006,7 @@ uuid = "a63ad114-7e13-5084-954f-fe012c677804"
 deps = ["LinearAlgebra", "Random", "Statistics"]
 path = "Models.jl"
 uuid = "d93e516b-cdf6-4941-872b-0848ac9e8f65"
-version = "1.2.0"
+version = "1.2.1"
 
 [[deps.MozillaCACerts_jll]]
 uuid = "14a3606d-f60d-562e-9121-12d972cd8159"

@@ -1,3 +1,4 @@
+
 using Models.TRNmodel
 using OrdinaryDiffEq
 using MAT
@@ -5,10 +6,10 @@ using MAT
 # main program
 function main()
 # Simulation//Run variables
-namesOfNeurons = ["TRN1"]
+namesOfNeurons = ["TRN$i" for i in 1:1]
 numNeurons = length(namesOfNeurons)
 startTime  = 0.0
-endTime    = 5000.0
+endTime    = 1000.0
 tspan = (startTime, endTime)
 dt = 0.1
 
@@ -16,10 +17,10 @@ dt = 0.1
 u0, per_neuron = initialconditions(numNeurons,false)
 
 ## vars
-var_iDC = -2:0.01:0.3
+var_ = 
 
-var_names = ["iDC"]
-var_combos = var_iDC
+var_names = [""]
+var_combos = allcombinations(var_, )
 
 ## Save//Run vars
 perBlk = 150
@@ -28,7 +29,7 @@ numBlks = Int(ceil(length(var_combos)/perBlk))
 allBlks = [var_combos[(1:perBlk).+(perBlk*(i-1))] for i in 1:numBlks-1]
 allBlks = vcat(allBlks, [var_combos[1+(perBlk*(numBlks-1)):end]])
 
-#=
+
 savepath = joinpath(pwd(),"results")
 if ~isdir(savepath)
     mkdir(savepath)
@@ -45,8 +46,7 @@ else
     D = matread(joinpath(savepath,"tmpBlk.mat"))
     tmpBlk = D["tmpBlk"]
 end
-=#
-tmpBlk = 1
+
 # Start running blocks
 while tmpBlk <= numBlks
 
@@ -74,30 +74,30 @@ while tmpBlk <= numBlks
 
     u = zeros(numNeurons,length(startTime:dt:endTime),numSims)
 
-    Threads.@threads for i = 1:numSims
+    @time Threads.@threads for i = 1:numSims
 
         p = Params[i]
 
         prob = ODEProblem(dsim!,u0,tspan,p)
 
         # Start sim
-        sol = solve(prob,VCAB3(),saveat=dt,save_idxs=1:p.per_neuron:length(u0))
+        sol = solve(prob,BS3(),saveat=dt,save_idxs=1:p.per_neuron:length(u0))
 
-        u[:,:,i]=sol[:,:]
+        u[:,:,i]=sol[1:p.n,:]
     end
 
     # Save Vm data
     simResults = constructResults(u,Params)
-    
-    #matwrite(joinpath(savepath,"simResults$tmpBlk.mat"),
-    #         simResults;compress = true)
+
+    matwrite(joinpath(savepath,"simResults$tmpBlk.mat"),
+                simResults;compress=true)
 
     tmpBlk += 1
-    #matwrite(joinpath(savepath,"tmpBlk.mat"),Dict("tmpBlk"=>tmpBlk))
+    matwrite(joinpath(savepath,"tmpBlk.mat"),Dict("tmpBlk"=>tmpBlk))
 end
 
-nothing
+return nothing
 end #main
 
-@time main()
+main()
 

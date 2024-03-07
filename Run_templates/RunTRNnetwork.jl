@@ -1,3 +1,4 @@
+
 using Models.TRNnetwork
 using OrdinaryDiffEq
 using MAT
@@ -52,8 +53,7 @@ while tmpBlock <= numBlocks
 
     ## Initialize simParams
     Params = Vector{simParams}(undef,reps)
-#Params = [Params for i=1:numSims] ##or copy params??
-#for p in Params ## eachindex()??
+
     for i = 1:reps
         p = simParams(names=namesOfNeurons,n=numNeurons,per_neuron=per_neuron)
 
@@ -63,10 +63,10 @@ while tmpBlock <= numBlocks
             ### DC
             p.bias[ii] = 0.3
             ### noise
-            p.A[ii] = 
-            p.tA[ii] = poissonP(80,endTime)
-            p.AI[ii] =
+            p.tA[ii]  = poissonP(80,endTime)
+            p.A[ii]   = 0.0.*randn(length(p.tA[ii])).+0.5
             p.tAI[ii] = poissonP(20,endTime)
+            p.AI[ii]  = 0.0.*randn(length(p.tAI[ii])).+0.5
         end
 
         Params[i] = p
@@ -81,9 +81,9 @@ while tmpBlock <= numBlocks
         prob = ODEProblem(dsim!,u0,tspan,p)
 
         # Start sim
-        sol = solve(prob,VCAB3(),saveat=dt,save_idxs=1:p.per_neuron:length(u0))
+        sol = solve(prob,BS3(),saveat=dt,save_idxs=1:p.per_neuron:length(u0))
 
-        u[:,:,i]=sol[:,:]
+        u[:,:,i]=sol[1:p.n,:]
     end
 
     # Save Vm data
@@ -96,10 +96,8 @@ while tmpBlock <= numBlocks
     matwrite(joinpath(savepath,"tmpBlock.mat"),Dict("tmpBlock"=>tmpBlock))
 end
 
-nothing
+return nothing
 end #main
 
-
 main()
-
 
