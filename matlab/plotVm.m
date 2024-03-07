@@ -4,9 +4,14 @@ if ~isfolder('results')
     error(['results not found in current working directory. '...
      'cd to sim directory and ensure sims ran and saved to results folder.'])
 end
+s= whos('-file','results/sim_vars.mat');
+if contains([s.name],'reps')
+load([pwd '/results/sim_vars.mat'], 'namesOfNeurons','tspan','dt','var_names','var_combos','reps');
+else
+load([pwd '/results/sim_vars.mat'], 'namesOfNeurons','tspan','dt','var_names','var_combos','perBlk');
+end
 
-load([pwd '/results/sim_vars.mat'], 'namesOfNeurons','tspan','dt','var_names','var_combos');
-load([pwd '/results/Sim_results1.mat'], 'Sim_results');
+load([pwd '/results/simResults1.mat'], 'simResults');
 
 
 fig = uifigure;
@@ -14,26 +19,17 @@ fig.Name = "Plot Vm Data";
 fig.Position = [100 100 1000 500];
 
 % Main grid
-grid1 = uigridlayout(fig,[2 1]);
-grid1.RowHeight = {'1x','fit'};
-
-
-n = length(namesOfNeurons);
-[nRows, nCols] = fitPlots(n);
-
-% Vm plots
-plotGrid = uigridlayout(grid1,[nRows, nCols]);
-plotGrid.UserData.currSimIdx = 1;
-
-for i = 1:n
-    ax(i) = uiaxes(plotGrid);
-    ax(i).Title.String = namesOfNeurons{i};
-end
+grid1 = uigridlayout(fig,[1 2]);
+grid1.ColumnWidth = {'fit','1x'};
 
 
 % UIgrid
-UIgrid = uigridlayout(grid1,[2, 8]);
-UIgrid.RowHeight = {'fit','fit'};
+numVars = length(var_names);
+numRows = 2+numVars;
+rowFits={repmat({'fit'},1,numRows)};
+
+UIgrid = uigridlayout(grid1,[numRows, 4]);
+UIgrid.RowHeight = rowFits{:};
 
 % UI contols
 % save plots
@@ -42,18 +38,19 @@ saveBtn.Text = 'Save Plots';
 saveBtn.ButtonPushedFcn = @saveData;
 
 % tspan
+t = tspan(1):dt:tspan(2);
 tspanLbl = uilabel(UIgrid);
 tspanLbl.Text = 'Timespan';
 tspanLbl.HorizontalAlignment = 'right';
 
-t1 = uieditfield(UIgrid,'numeric');
+t1 = uispinner(UIgrid);
 t1.Value = tspan(1);
 t1.ValueDisplayFormat = '%.0f ms';
 t1.Limits = tspan;
 t1.UpperLimitInclusive = 'off';
 t1.ValueChangedFcn = @updatePlots;
 
-t2 = uieditfield(UIgrid,'numeric');
+t2 = uispinner(UIgrid);
 t2.Value = tspan(2);
 t2.ValueDisplayFormat = '%.0f ms';
 t2.Limits = tspan;
@@ -61,8 +58,8 @@ t2.LowerLimitInclusive = 'off';
 t2.ValueChangedFcn = @updatePlots;
 
 % replication slider
-reps = 1:50;
-
+if contains([s.name],'reps')
+reps = 1:reps;
 repLbl = uilabel(UIgrid);
 repLbl.Text = 'replication';
 repLbl.HorizontalAlignment = 'right';
@@ -72,7 +69,7 @@ lbRep.Text = '<-';
 
 varDispRep = uieditfield(UIgrid,'numeric');
 varDispRep.Value = reps(1);
-varDispRep.UserData = struct('vars',reps,'currIdx',i);
+varDispRep.UserData = struct('vars',reps,'currIdx',1);
 varDispRep.Editable = 'off';
 
 rbRep = uibutton(UIgrid);
@@ -80,39 +77,47 @@ rbRep.Text = '->';
 
 lbRep.ButtonPushedFcn = {@sliderMoved, varDispRep};
 rbRep.ButtonPushedFcn = {@sliderMoved, varDispRep};
-
+end
 
 % Var sliders
-numVarRows = ceil(length(var_names)/2);
-rowFits={repmat({'fit'},1,numVarRows)};
-
-varGrid = uigridlayout(UIgrid,[numVarRows, 8]);
-varGrid.RowHeight = rowFits{:};
-varGrid.Layout.Column = [1,8];
-
-for i = 1:length(var_names)
+for i = 1:numVars
     var_vectors(i) = {unique(var_combos(:,i))};
 
-    varLbl(i) = uilabel(varGrid);
+    varLbl(i) = uilabel(UIgrid);
     varLbl(i).Text = var_names{i};
     varLbl(i).HorizontalAlignment = 'right';
 
-    lb(i) = uibutton(varGrid);
+    lb(i) = uibutton(UIgrid);
     lb(i).Text = '<-';
 
-    varDisp(i) = uieditfield(varGrid,'numeric');
+    varDisp(i) = uieditfield(UIgrid,'numeric');
     varDisp(i).Value = var_vectors{i}(1);
-    varDisp(i).UserData = struct('vars',var_vectors(i),'currIdx',i);
+    varDisp(i).UserData = struct('vars',var_vectors(i),'currIdx',1);
     varDisp(i).Editable = 'off';
 
-    rb(i) = uibutton(varGrid);
+    rb(i) = uibutton(UIgrid);
     rb(i).Text = '->';
 
     lb(i).ButtonPushedFcn = {@sliderMoved, varDisp(i)};
     rb(i).ButtonPushedFcn = {@sliderMoved, varDisp(i)};
 end
 
+
+% Vm plots
+numNeurons = length(namesOfNeurons);
+[nRows, nCols] = fitPlots(numNeurons);
+
+plotGrid = uigridlayout(grid1,[nRows, nCols]);
+plotGrid.UserData.currSimIdx = 1;
+
+for n = 1:numNeurons
+    ax(n) = uiaxes(plotGrid);
+    ax(n).Title.String = namesOfNeurons{n};
+end
+
+
 updatePlots;
+uiwait(fig)
 
 % Callbacks
 function sliderMoved(src,~,varDisp)
@@ -146,17 +151,30 @@ function updatePlots(~,~)
     %tic
     simIdx = find(ismember(var_combos,[varDisp(:).Value],'rows'));
 
-    if simIdx ~= plotGrid.UserData.currSimIdx
-    load([pwd '/results/Sim_results' num2str(simIdx) '.mat'], 'Sim_results');
-    plotGrid.UserData.currSimIdx = simIdx;
-    end
+    if contains([s.name],'reps')
+        if simIdx ~= plotGrid.UserData.currSimIdx
+        load([pwd '/results/simResults' num2str(simIdx) '.mat'], 'simResults');
+        plotGrid.UserData.currSimIdx = simIdx;
+        end
 
-    t = tspan(1):dt:tspan(2);
-    tIdx = find(t>=t1.Value & t<=t2.Value);
+        for ii=1:numNeurons
+            vm = simResults(varDispRep.Value).data.(namesOfNeurons{ii});
+            plot(ax(ii),t,vm);
+            xlim(ax(ii),[t1.Value, t2.Value]);
+        end
+    else
+        if simIdx ~= plotGrid.UserData.currSimIdx
+        if ceil(simIdx/perBlk) ~= ceil(plotGrid.UserData.currSimIdx/perBlk)
+        load([pwd '/results/simResults' num2str(ceil(simIdx/perBlk)) '.mat'], 'simResults');
+        end
+        plotGrid.UserData.currSimIdx = simIdx;
+        end
 
-    for ii=1:n
-        vm = Sim_results(varDispRep.Value).data.(namesOfNeurons{ii});
-        plot(ax(ii),t(tIdx),vm(tIdx));
+        for ii=1:numNeurons
+            vm = simResults(1+mod(simIdx-1,perBlk)).data.(namesOfNeurons{ii});
+            plot(ax(ii),t,vm);
+            xlim(ax(ii),[t1.Value, t2.Value]);
+        end
     end
     %toc
 end

@@ -53,7 +53,7 @@ for x=1:n_totalVars
         [psth, centers] = returnHistogram(total_spks, tspan(2), n_trials, 31);
 
         spk_data(x).FR.time = centers;
-        spk_data(x).FR.(namesOfNeurons{n}) = psth;
+        spk_data(x).FR.(namesOfNeurons{n}) = psth.*1000;
     end
 end
 

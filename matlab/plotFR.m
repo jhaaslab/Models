@@ -14,39 +14,17 @@ fig.Name = "Plot FR Data";
 fig.Position = [100 100 1000 500];
 
 % Main grid
-grid1 = uigridlayout(fig,[2 1]);
-grid1.RowHeight = {'1x','fit'};
-
-
-% Raster/FR tab
-plotTabs = uitabgroup(grid1);
-plotTabs.SelectionChangedFcn = @switchTab;
-
-n = length(namesOfNeurons);
-[nRows, nCols] = fitPlots(n);
-
-% FR
-FRtab = uitab(plotTabs,'Title','Firing Rate');
-FRgrid = uigridlayout(FRtab,[nRows, nCols]);
-
-for i = 1:n
-    axFR(i) = uiaxes(FRgrid);
-    axFR(i).Title.String = namesOfNeurons{i};
-end
-
-% Rasters
-RasterTab = uitab(plotTabs,'Title','Rasters');
-RasterGrid = uigridlayout(RasterTab,[nRows nCols]);
-
-for i = 1:n
-    axRasters(i) = uiaxes(RasterGrid);
-    axRasters(i).Title.String = namesOfNeurons{i};
-end
+grid1 = uigridlayout(fig,[1 2]);
+grid1.ColumnWidth = {'fit','1x'};
 
 
 % UIgrid
-UIgrid = uigridlayout(grid1,[2, 6]);
-UIgrid.RowHeight = {'fit','fit'};
+numVars = length(var_names);
+numRows = 2+numVars;
+rowFits={repmat({'fit'},1,numRows)};
+
+UIgrid = uigridlayout(grid1,[numRows, 4]);
+UIgrid.RowHeight = rowFits{:};
 
 % UI contols
 % save plots
@@ -54,77 +32,120 @@ saveBtn = uibutton(UIgrid);
 saveBtn.Text = 'Save Plots';
 saveBtn.ButtonPushedFcn = @saveData;
 
-% normalize
-normLbl = uilabel(UIgrid);
-normLbl.Text = 'Normalize:';
-normLbl.HorizontalAlignment = 'right';
-
-normField = uieditfield(UIgrid, 'numeric');
-normField.Value = 1;
-normField.ValueChangedFcn = @updatePlots;
-
 % tspan
 tspanLbl = uilabel(UIgrid);
 tspanLbl.Text = 'Timespan';
 tspanLbl.HorizontalAlignment = 'right';
 
-t1 = uieditfield(UIgrid,'numeric');
+t1 = uispinner(UIgrid);
 t1.Value = tspan(1);
 t1.ValueDisplayFormat = '%.0f ms';
 t1.Limits = tspan;
 t1.UpperLimitInclusive = 'off';
 t1.ValueChangedFcn = @updatePlots;
 
-t2 = uieditfield(UIgrid,'numeric');
+t2 = uispinner(UIgrid);
 t2.Value = tspan(2);
 t2.ValueDisplayFormat = '%.0f ms';
 t2.Limits = tspan;
 t2.LowerLimitInclusive = 'off';
 t2.ValueChangedFcn = @updatePlots;
 
+
+% mean FR
+meanLbl = uilabel(UIgrid);
+meanLbl.Text = 'display Mean FR:';
+meanLbl.HorizontalAlignment = 'right';
+
+meancbx = uicheckbox(UIgrid);
+meancbx.ValueChangedFcn = @updatePlots;
+
+meant1 = uispinner(UIgrid);
+meant1.Value = tspan(1);
+meant1.ValueDisplayFormat = '%.0f ms';
+meant1.Limits = tspan;
+meant1.UpperLimitInclusive = 'off';
+meant1.ValueChangedFcn = @updatePlots;
+
+meant2 = uispinner(UIgrid);
+meant2.Value = tspan(2);
+meant2.ValueDisplayFormat = '%.0f ms';
+meant2.Limits = tspan;
+meant2.LowerLimitInclusive = 'off';
+meant2.ValueChangedFcn = @updatePlots;
+
+
 % Var sliders
-numVarRows = ceil(length(var_names)/2);
-rowFits={repmat({'fit'},1,numVarRows)};
-
-varGrid = uigridlayout(UIgrid,[numVarRows, 8]);
-varGrid.RowHeight = rowFits{:};
-varGrid.Layout.Column = [1,6];
-
-for i = 1:length(var_names)
+for i = 1:numVars
     var_vectors(i) = {unique(var_combos(:,i))};
 
-    varLbl(i) = uilabel(varGrid);
+    varLbl(i) = uilabel(UIgrid);
     varLbl(i).Text = var_names{i};
     varLbl(i).HorizontalAlignment = 'right';
 
-    lb(i) = uibutton(varGrid);
+    lb(i) = uibutton(UIgrid);
     lb(i).Text = '<-';
 
-    varDisp(i) = uieditfield(varGrid,'numeric');
+    varDisp(i) = uieditfield(UIgrid,'numeric');
     varDisp(i).Value = var_vectors{i}(1);
-    varDisp(i).UserData = struct('vars',var_vectors(i),'currIdx',i);
-    varDisp(i).Editable = 'off'; 
+    varDisp(i).UserData = struct('vars',var_vectors(i),'currIdx',1);
+    varDisp(i).Editable = 'off';
 
-    rb(i) = uibutton(varGrid);
+    rb(i) = uibutton(UIgrid);
     rb(i).Text = '->';
 
     lb(i).ButtonPushedFcn = {@sliderMoved, varDisp(i)};
     rb(i).ButtonPushedFcn = {@sliderMoved, varDisp(i)};
 end
 
-updatePlots;
 
-% Callbacks 
+% Raster/FR tab
+plotTabs = uitabgroup(grid1);
+plotTabs.SelectionChangedFcn = @switchTab;
+
+numNeurons = length(namesOfNeurons);
+[nRows, nCols] = fitPlots(numNeurons);
+
+% FR
+FRtab  = uitab(plotTabs,'Title','Firing Rate');
+FRgrid = uigridlayout(FRtab,[nRows, nCols]);
+
+for i = 1:numNeurons
+    axFR(i) = uiaxes(FRgrid);
+    axFR(i).Title.String = namesOfNeurons{i};
+end
+
+% Rasters
+RasterTab  = uitab(plotTabs,'Title','Rasters');
+RasterGrid = uigridlayout(RasterTab,[nRows nCols]);
+
+for i = 1:numNeurons
+    axRasters(i) = uiaxes(RasterGrid);
+    axRasters(i).Title.String = namesOfNeurons{i};
+end
+
+
+updatePlots;
+uiwait(fig)
+
+
+% Callbacks
 function switchTab(~,event)
     tab = event.NewValue.Title;
+
     switch tab
     case 'Firing Rate'
-        normLbl.Visible = 'on';
-        normField.Visible = 'on';
+        meanLbl.Visible = 'on';
+        meancbx.Visible = 'on';
+        meant1.Visible  = 'on';
+        meant2.Visible  = 'on';
     case 'Rasters'
-        normLbl.Visible = 'off';
-        normField.Visible = 'off';
+        meanLbl.Visible = 'off';
+        meancbx.Visible = 'off';
+        meant1.Visible  = 'off';
+        meant2.Visible  = 'off';
     end
+
 end
 
 function sliderMoved(src,~,varDisp)
@@ -158,11 +179,23 @@ function updatePlots(~,~)
     idx = find(ismember(var_combos,[varDisp(:).Value],'rows'));
 
     t = spk_data(idx).FR.time;
-    tIdx = find(t>=t1.Value & t<=t2.Value);
 
-    for ii=1:n
-        FR = spk_data(idx).FR.(namesOfNeurons{ii})./normField.Value;
-        plot(axFR(ii),t(tIdx),FR(tIdx));
+    for ii=1:numNeurons
+        FR = spk_data(idx).FR.(namesOfNeurons{ii});
+        meanFR = mean(FR(t>meant1.Value & t<meant2.Value));
+
+        hold(axFR(ii),'off')
+        plot(axFR(ii),t,FR);
+        xlim(axFR(ii),[t1.Value, t2.Value]);
+        ylim(axFR(ii),[0, 100]);
+
+        if meancbx.Value == 1
+            hold(axFR(ii),'on')
+            plot(axFR(ii),[meant1.Value meant2.Value],[meanFR meanFR]);
+
+            txt = ['Mean FR: ' num2str(meanFR) ' Hz'];
+            text(axFR(ii),(tspan(1)+tspan(2))/2,80,txt);
+        end
 
         spks=[];
         for trial = 1:40
@@ -171,7 +204,7 @@ function updatePlots(~,~)
         end
 
         plot(axRasters(ii),spks(1,:),spks(2,:)-0.5,'k.','MarkerSize',8);
-        axRasters(ii).XLim = [t1.Value t2.Value];
+        xlim(axRasters(ii),[t1.Value, t2.Value]);
     end
 end
 
