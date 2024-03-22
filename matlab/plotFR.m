@@ -53,6 +53,7 @@ t2.ValueChangedFcn = @updatePlots;
 
 
 % mean FR
+t = 0.5:1:tspan(2);
 meanLbl = uilabel(UIgrid);
 meanLbl.Text = 'display Mean FR:';
 meanLbl.HorizontalAlignment = 'right';
@@ -178,7 +179,6 @@ end
 function updatePlots(~,~)
     idx = find(ismember(var_combos,[varDisp(:).Value],'rows'));
 
-    t = spk_data(idx).FR.time;
 
     for ii=1:numNeurons
         FR = spk_data(idx).FR.(namesOfNeurons{ii});
@@ -187,14 +187,14 @@ function updatePlots(~,~)
         hold(axFR(ii),'off')
         plot(axFR(ii),t,FR);
         xlim(axFR(ii),[t1.Value, t2.Value]);
-        ylim(axFR(ii),[0, 100]);
+        ylim(axFR(ii),[0, 50]);
 
         if meancbx.Value == 1
             hold(axFR(ii),'on')
             plot(axFR(ii),[meant1.Value meant2.Value],[meanFR meanFR]);
 
             txt = ['Mean FR: ' num2str(meanFR) ' Hz'];
-            text(axFR(ii),(tspan(1)+tspan(2))/2,80,txt);
+            text(axFR(ii),(tspan(1)+tspan(2))/2,40,txt);
         end
 
         spks=[];

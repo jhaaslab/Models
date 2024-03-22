@@ -1,8 +1,10 @@
 function Iapp_f(bias,I,t,(Istart,Istop))
-    if any((t.>=Istart) .* (t.<=Istop))
-        return -I
-    else
-        return -bias
+    for i in eachindex(Istart)
+        if t>=Istart[i] && t<=Istop[i]
+            return -I
+        else
+            return -bias
+        end
     end
 end
 
@@ -20,10 +22,12 @@ function ExtSyn_f(t,tA,A)
 end
 
 function GtACR_f(G,t,(on,off))
-    if any((t.>=on) .* (t.<=off))
-        return G
-    else
-        return 0.0
+    for i in eachindex(on)
+        if t>=on[i] && t<=off[i]
+            return G
+        else
+            return 0.0
+        end
     end
 end
 

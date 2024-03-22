@@ -4,13 +4,15 @@ module Models
 using Statistics
 using Random
 using LinearAlgebra
+using Peaks, NaNStatistics, DSP
 
 ## self defined -- top level deps
 #------------------------------------------------------------
 # Run helper functions:
 #------------------------------------------------------------
 include("RunUtils.jl")
-export allcombinations, constructResults, meanvm!
+export allcombinations, psthFR, findspks
+export constructResults, simVars, simResults, spkData
 #------------------------------------------------------------
 
 #------------------------------------------------------------
@@ -44,7 +46,8 @@ module TRNmodel
 using Models
 
 export dsim!, simParams, initialconditions
-export allcombinations, constructResults, meanvm!
+export allcombinations, constructResults,simVars, simResults, spkData 
+export findspks, psthFR
 
 include("TRNmodel.jl")
 
@@ -58,7 +61,8 @@ using Models
 
 export dsim!, simParams, initialconditions
 export poissonP, constructGJ
-export allcombinations, constructResults, meanvm!
+export allcombinations, constructResults,simVars, simResults, spkData 
+export findspks, psthFR
 
 include("TRNnetwork.jl")
 
@@ -72,7 +76,8 @@ using Models
 
 export dsim!, simParams, initialconditions
 export poissonP, constructGJ, constructConnections
-export allcombinations, constructResults, meanvm!
+export allcombinations, constructResults,simVars, simResults, spkData 
+export findspks, psthFR
 
 include("TC_TRNnetwork.jl")
 

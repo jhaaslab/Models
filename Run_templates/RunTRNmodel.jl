@@ -8,8 +8,8 @@ function main()
 # Simulation//Run variables
 namesOfNeurons = ["TRN$i" for i in 1:1]
 numNeurons = length(namesOfNeurons)
-startTime  = 0.0
-endTime    = 1000.0
+startTime  = 0
+endTime    = 1000
 tspan = (startTime, endTime)
 dt = 0.1
 
@@ -41,7 +41,7 @@ if ~isdir(savepath)
         "tspan"=>collect(tspan), "dt"=>dt,
         "var_names"=>var_names, "perBlk"=>convert(Float64,perBlk),
         "var_combos"=>[tup[k] for tup in var_combos, k in 1:length(var_names)])
-    matwrite(joinpath(savepath,"sim_vars.mat"),D_vars;compress = true)
+    matwrite(joinpath(savepath,"sim_vars.mat"),D_vars)
 else
     D = matread(joinpath(savepath,"tmpBlk.mat"))
     tmpBlk = D["tmpBlk"]
@@ -89,8 +89,7 @@ while tmpBlk <= numBlks
     # Save Vm data
     simResults = constructResults(u,Params)
 
-    matwrite(joinpath(savepath,"simResults$tmpBlk.mat"),
-                simResults;compress=true)
+    matwrite(joinpath(savepath,"simResults$tmpBlk.mat"),simResults)
 
     tmpBlk += 1
     matwrite(joinpath(savepath,"tmpBlk.mat"),Dict("tmpBlk"=>tmpBlk))

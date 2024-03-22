@@ -9,8 +9,8 @@ function main()
 # Simulation//Run variables
 namesOfNeurons = [["TRN$i" for i in 1:9]; ["TC$i" for i in 1:9]]
 numNeurons = length(namesOfNeurons)
-startTime  = 0.0
-endTime    = 1000.0
+startTime  = 0
+endTime    = 1000
 dt = 0.1
 tspan = (startTime, endTime)
 
@@ -38,7 +38,7 @@ if ~isdir(savepath)
         "tspan"=>collect(tspan), "dt"=>dt,
         "var_names"=>var_names, "reps"=>convert(Float64,reps),
         "var_combos"=>[tup[k] for tup in var_combos, k in 1:length(var_names)])
-    matwrite(joinpath(savepath,"sim_vars.mat"),D_vars;compress = true)
+    matwrite(joinpath(savepath,"sim_vars.mat"),D_vars)
 else
     D = matread(joinpath(savepath,"tmpBlock.mat"))
     tmpBlock = D["tmpBlock"]
@@ -64,9 +64,9 @@ while tmpBlock <= numBlocks
             p.bias[ii] = 0.3
             ### noise
             p.tA[ii]  = poissonP(80,endTime)
-            p.A[ii]   = 0.0.*randn(length(p.tA[ii])).+0.5
+            p.A[ii]   = 0.01.*randn(length(p.tA[ii])).+0.1
             p.tAI[ii] = poissonP(20,endTime)
-            p.AI[ii]  = 0.0.*randn(length(p.tAI[ii])).+0.5
+            p.AI[ii]  = 0.01.*randn(length(p.tAI[ii])).+0.1
         end
 
         Params[i] = p
@@ -89,8 +89,7 @@ while tmpBlock <= numBlocks
     # Save Vm data
     simResults = constructResults(u,Params)
 
-    matwrite(joinpath(savepath,"simResults$tmpBlock.mat"),
-             simResults;compress = true)
+    matwrite(joinpath(savepath,"simResults$tmpBlock.mat"),simResults)
 
     tmpBlock += 1
     matwrite(joinpath(savepath,"tmpBlock.mat"),Dict("tmpBlock"=>tmpBlock))

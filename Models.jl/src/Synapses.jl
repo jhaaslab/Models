@@ -6,7 +6,7 @@ function K_syn(v)
 end
 
 function poissonP(r,T)
-    # POISSONP Poisson process for generating stochastic spike trains
+    # Poisson process for generating stochastic spike trains
     # Computes spike times for given rate(r) in Hz over total time(T) in ms
     dt = 0.1 # ms
     spks = zeros(Int(T*(1.0/dt)))
@@ -17,10 +17,10 @@ function poissonP(r,T)
 end
 
 function constructGJ(num_TRN,mu_gc,sig_gc)
-    #CONSTRUCTGJ generate random coupling within TRN network
-    #   Each cell makes 1-3 connections with P 0.45 0.5 0.05 respectively
-    #   P synapse will favor cells with no GJs (0.2 bias)
-    #   Coupling strength values are gaussian following mu,sig
+    # generate random coupling within TRN network
+    # Each cell makes 1-3 connections with P 0.45 0.5 0.05 respectively
+    # P synapse will favor cells with no GJs (0.2 bias)
+    # Coupling strength values are gaussian following mu,sig
     if sig_gc > mu_gc
         error("sigma larger than mean Gc, use a smaller value to prevent negative values")
     end
@@ -70,11 +70,14 @@ function constructGJ(num_TRN,mu_gc,sig_gc)
 end #constructGJ
 
 function constructConnections(num_pairs,recip_prob,div_prob,A_mean,A_sig)
-    #CONSTRUCTCONNECTIONS generate random synapses between TRN-TC networks
-    #   Each possible location has prob of occuring, with recip_prob and 
-    #   div_prob for connections between same cell pair and surrounding cells
-    #   respectively. Synapse strength values are gaussian following mu, sig,
-    #   normalized to total number of synapses recieved by each cell.
+    # generate random synapses between TRN-TC networks
+    # Each possible location has prob of occuring, with recip_prob and
+    # div_prob for connections between same cell pair and surrounding cells
+    # respectively. Synapse strength values are gaussian following mu, sig,
+    # normalized to total number of synapses recieved by each cell.
+    if A_sig > A_mean
+        error("sigma larger than mean, use a smaller value to prevent negative values")
+    end
 
     connMat = zeros(num_pairs,num_pairs)
     R = rand(num_pairs,num_pairs)
