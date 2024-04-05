@@ -20,21 +20,8 @@
               },
               "pinned": true
             }
-          },
-          {
-            "id": "2acfe4cbba10c2d2",
-            "type": "leaf",
-            "state": {
-              "type": "markdown",
-              "state": {
-                "file": "docs/Julia setup.md",
-                "mode": "preview",
-                "source": false
-              }
-            }
           }
-        ],
-        "currentTab": 1
+        ]
       }
     ],
     "direction": "vertical"
@@ -79,22 +66,6 @@
               "type": "bookmarks",
               "state": {}
             }
-          },
-          {
-            "id": "a956078f02894409",
-            "type": "leaf",
-            "state": {
-              "type": "git-view",
-              "state": {}
-            }
-          },
-          {
-            "id": "84ab996fe1ce2730",
-            "type": "leaf",
-            "state": {
-              "type": "git-history-view",
-              "state": {}
-            }
           }
         ]
       }
@@ -116,7 +87,7 @@
             "state": {
               "type": "backlink",
               "state": {
-                "file": "docs/Julia setup.md",
+                "file": "README.md",
                 "collapseAll": false,
                 "extraContext": false,
                 "sortOrder": "alphabetical",
@@ -133,7 +104,7 @@
             "state": {
               "type": "outgoing-link",
               "state": {
-                "file": "docs/Julia setup.md",
+                "file": "README.md",
                 "linksCollapsed": false,
                 "unlinkedCollapsed": true
               }
@@ -156,7 +127,7 @@
             "state": {
               "type": "outline",
               "state": {
-                "file": "docs/Julia setup.md"
+                "file": "README.md"
               }
             }
           },
@@ -170,6 +141,22 @@
                 "showSearch": false,
                 "searchQuery": ""
               }
+            }
+          },
+          {
+            "id": "a956078f02894409",
+            "type": "leaf",
+            "state": {
+              "type": "git-view",
+              "state": {}
+            }
+          },
+          {
+            "id": "84ab996fe1ce2730",
+            "type": "leaf",
+            "state": {
+              "type": "git-history-view",
+              "state": {}
             }
           }
         ],
@@ -190,35 +177,35 @@
       "command-palette:Open command palette": false
     }
   },
-  "active": "2acfe4cbba10c2d2",
+  "active": "2dfc1de21bc1b4e2",
   "lastOpenFiles": [
-    "matlab/plotVm.m~",
-    "matlab/plotFR.m~",
-    "matlab/model/extractData.m~",
-    "matlab/extractData.m~",
-    "Run_templates/RunTRNmodel.jl~",
-    "Run_templates/RunTRNnetwork.jl~",
-    "Run_templates/RunTC_TRNnetwork.jl~",
-    "Models.jl/Project.toml~",
-    "Run_templates/Run_simple.jl~",
-    "Run_templates/4913",
-    "Models.jl/src/TC_TRNnetwork.jl~",
-    "README.md",
-    "docs/matlab/poissonP.md",
-    "docs/matlab/dsim.md",
-    "docs/matlab/Plotting tools.md",
-    "docs/matlab/Parallel pool.md",
-    "docs/matlab/Matlab setup.md",
-    "docs/matlab/Matlab Model.md",
-    "docs/matlab/ExtractData.md",
-    "docs/matlab/simParams.md",
     "docs/matlab/Run_dsim.md",
+    "simulations/test2/results/simResults1.mat",
+    "simulations/test2/results",
+    "simulations/test2/vars/RNG_seed.mat",
+    "simulations/test2/vars/tmpBlock.mat",
+    "simulations/test2/vars/sim_vars.mat",
+    "simulations/test2/vars",
+    "simulations/test2/Run_dsim.m~",
+    "simulations/test2/4913",
+    "matlab/plotVm.m~",
+    "docs/matlab/dsim.md",
+    "docs/matlab/Matlab Model.md",
+    "docs/matlab/simParams.md",
+    "README.md",
+    "docs/matlab/ExtractData.md",
+    "docs/matlab/Plotting tools.md",
+    "matlab/model/Run_dsim.m~",
+    "docs/matlab/Matlab setup.md",
+    "docs/matlab/poissonP.md",
+    "docs/matlab/Parallel pool.md",
     "docs/Julia examples.md",
-    "docs/Julia Model.md",
-    "docs/Julia setup.md",
-    "docs/Run Script.md",
-    "docs/Synapse construction.md",
     "docs/TRNmodel.md",
+    "docs/Synapse construction.md",
+    "docs/Run Script.md",
+    "docs/Julia Model.md",
+    "docs/Run_dsim.md",
+    "docs/Julia setup.md",
     "docs/Matlab setup.md",
     "docs/Modules.md",
     "poissonP.md",
@@ -228,7 +215,6 @@
     "Matlab setup.md",
     "Parallel pool.md",
     "Code/Matlab/benchmark.jpg",
-    "simParams.md",
     "Untitled.canvas"
   ]
 }

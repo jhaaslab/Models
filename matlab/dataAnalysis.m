@@ -1,26 +1,64 @@
-% sort, norm, plot etc.
-%{
-TCsurround_FR(x,:) = mean(TC_FR);
-TCsurround_meanFR(x)= mean(TCsurround_FR(x,516:975));
-TCsurroundFR_SEM(x)=std(TCsurround_FR(x,516:975))/sqrt(length(TCsurround_FR(x,516:975)));
+function dataAnalysis()
+% ISI, mean, plot etc.
 
-TRNsurround_FR(x,:) = mean(TRN_FR);
-TRNsurround_meanFR(x)= mean(TRNsurround_FR(x,516:975));
-TRNsurroundFR_SEM(x)=std(TRNsurround_FR(x,516:975))/sqrt(length(TRNsurround_FR(x,516:975)));
-
-TCsurround_gain=TCsurround_meanFR./TCsurround0;
-TRNsurround_gain=TRNsurround_meanFR./TRNsurround0;
-
-
-figure(1);plot(centers,TCsurround_FR./TCsurround0);savefig([pwd '/data/TCsurround_plots.fig'])
-figure(2);plot(centers,TRNsurround_FR./TRNsurround0);savefig([pwd '/data/TRNsurround_plots.fig'])
-
-
-save([pwd '/data/TCsurround.mat'],'TC_FR','TCsurround_FR','TCsurround_meanFR','TCsurroundFR_SEM')
-save([pwd '/data/TRNsurround.mat'],'TRN_FR','TRNsurround_FR','TRNsurround_meanFR','TRNsurroundFR_SEM')
-
-for x=1:120
-    TRN_meanFR(x) = mean(spk_data(x).FR.TRN1(516:975));
+if ~isfolder('data')
+    error(['data not found in current working directory. '...
+     'cd to sim directory and ensure sim data was extracted.'])
 end
-TRN1_meanFR = reshape(TRN_meanFR,6,[])';
+
+load([pwd '/vars/sim_vars.mat'], 'namesOfNeurons','tspan','reps','perBlk','var_combos');
+
+
+t=0.5:1:tspan(2);
+
+n_totalVars = length(var_combos);
+numBlks     = ceil(n_totalVars/perBlk);
+numCells    = length(namesOfNeurons);
+n_trials    = reps;
+
+spkData_all=[];
+for b = 1:numBlks
+load([pwd '/data/spkData' num2str(b) '.mat'],  'spkData');
+
+spkData = [spkData{:}];
+save([pwd '/data/spkData' num2str(b) '.mat'],  'spkData');
+
+spkData_all = [spkData_all spkData];
+end
+
+spkData = spkData_all;
+save([pwd '/data/spkData.mat'],  'spkData');
+
+
+%ISI{numCells,n_totalVars} = [];
+meanFR = zeros(numCells,n_totalVars); tmean=[515, 575];
+for x=1:n_totalVars
+
+for n=1:numCells
+%{
+for i=1:n_trials
+    % ISI
+    spksi = spk_data(x).spktime.(namesOfNeurons{n}){i};
+    spksi = spksi(spksi>300);
+
+    if length(spksi) > 1
+        isi_i = spksi(2:end)-spksi(1:end-1);
+        ISI{n,x} = [ISI{n,x} isi_i];
+    end
+
+end
 %}
+% meanFR
+FR = spkData(x).FR.(namesOfNeurons{n});
+
+meanFR(n,x) = mean(FR(t>tmean(1) & t<tmean(2)));
+
+end
+end
+
+%meanFR = reshape(meanFR,numCells, )
+
+%save([pwd '/data/ISI.mat'],   'ISI')
+save([pwd '/data/meanFR_I1.mat'],'meanFR')
+
+end

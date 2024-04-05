@@ -31,9 +31,6 @@ classdef simParams
         E_GABA  = -100;
 
         C = 1;       % membrance capacitance uF/cm^2
-
-        Rin
-        vm_rest
         
         
         % DC pulses, uA/cm2
@@ -62,9 +59,7 @@ classdef simParams
         AI_TRN       %amplitude of GABAergic TRN synapses
         
         % Electrical Synapses, mS/cm^2
-        Gc_total
         gj
-        cc
     end
     
     methods

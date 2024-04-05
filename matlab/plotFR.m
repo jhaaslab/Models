@@ -5,8 +5,8 @@ if ~isfolder('data')
      'cd to sim directory and ensure sim data was extracted.'])
 end
 
-load([pwd '/results/sim_vars.mat'], 'namesOfNeurons','tspan','var_names','var_combos');
-load([pwd '/data/spk_data.mat'],    'spk_data');
+load([pwd '/vars/sim_vars.mat'], 'namesOfNeurons','tspan','var_names','var_combos');
+load([pwd '/data/spkData.mat'],  'spkData');
 
 
 fig = uifigure;
@@ -19,6 +19,10 @@ grid1.ColumnWidth = {'fit','1x'};
 
 
 % UIgrid
+if any(contains(var_names, 'rep'))
+    var_names = var_names(2:end);
+    var_combos= unique(var_combos(:,2:end),'rows');
+end
 numVars = length(var_names);
 numRows = 2+numVars;
 rowFits={repmat({'fit'},1,numRows)};
@@ -33,6 +37,7 @@ saveBtn.Text = 'Save Plots';
 saveBtn.ButtonPushedFcn = @saveData;
 
 % tspan
+t = 0.5:1:tspan(2);
 tspanLbl = uilabel(UIgrid);
 tspanLbl.Text = 'Timespan';
 tspanLbl.HorizontalAlignment = 'right';
@@ -53,7 +58,6 @@ t2.ValueChangedFcn = @updatePlots;
 
 
 % mean FR
-t = 0.5:1:tspan(2);
 meanLbl = uilabel(UIgrid);
 meanLbl.Text = 'display Mean FR:';
 meanLbl.HorizontalAlignment = 'right';
@@ -179,9 +183,8 @@ end
 function updatePlots(~,~)
     idx = find(ismember(var_combos,[varDisp(:).Value],'rows'));
 
-
     for ii=1:numNeurons
-        FR = spk_data(idx).FR.(namesOfNeurons{ii});
+        FR = spkData(idx).FR.(namesOfNeurons{ii});
         meanFR = mean(FR(t>meant1.Value & t<meant2.Value));
 
         hold(axFR(ii),'off')
@@ -199,8 +202,8 @@ function updatePlots(~,~)
 
         spks=[];
         for trial = 1:40
-        tspks = spk_data(idx).spktime.(namesOfNeurons{ii}){trial};
-        spks = [spks, [tspks;repmat(trial,1,length(tspks))]];
+        tspks = spkData(idx).spktime.(namesOfNeurons{ii}){trial};
+        spks = [spks, [tspks';repmat(trial,1,length(tspks))]];
         end
 
         plot(axRasters(ii),spks(1,:),spks(2,:)-0.5,'k.','MarkerSize',8);

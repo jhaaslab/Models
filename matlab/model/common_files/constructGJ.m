@@ -1,4 +1,4 @@
-function [gjMat] = constructGJ2(num_TRN,mu_gc,sig_gc)
+function [gjMat] = constructGJ(num_TRN,mu_gc,sig_gc)
 %CONSTRUCTGJ generate random coupling within TRN network
 %   Each cell makes 1-3 connections with P 0.45 0.5 0.05 respectively
 %   P synapse will favor cells with no GJs (0.2 bias)

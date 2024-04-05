@@ -24,12 +24,6 @@ for ii=1:sim.n
     sim.iDC(ii) = 0.3; %bursts -0.1 burst-tonic 0.3, tonic 0.5
     sim.istart{ii} = 200;
     sim.istop{ii} = 800;
-    %{
-    sim.A(ii) = 0.05;
-    sim.tA{ii} = poissonP(80,endTime/1000);
-    sim.AI(ii) = 0.05;
-    sim.tAI{ii} = poissonP(20,endTime/1000);
-    %}
 end
 tic
 [t,s] = ode23(@(t,s) dsim_reduced(t,s,sim),tspan,sim.s0,options);

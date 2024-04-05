@@ -4,12 +4,8 @@ if ~isfolder('results')
     error(['results not found in current working directory. '...
      'cd to sim directory and ensure sims ran and saved to results folder.'])
 end
-s= whos('-file','results/sim_vars.mat');
-if contains([s.name],'reps')
-load([pwd '/results/sim_vars.mat'], 'namesOfNeurons','tspan','dt','var_names','var_combos','reps');
-else
-load([pwd '/results/sim_vars.mat'], 'namesOfNeurons','tspan','dt','var_names','var_combos','perBlk');
-end
+
+load([pwd '/vars/sim_vars.mat'], 'namesOfNeurons','tspan','var_names','var_combos','perBlock');
 
 load([pwd '/results/simResults1.mat'], 'simResults');
 
@@ -38,7 +34,6 @@ saveBtn.Text = 'Save Plots';
 saveBtn.ButtonPushedFcn = @saveData;
 
 % tspan
-t = tspan(1):dt:tspan(2);
 tspanLbl = uilabel(UIgrid);
 tspanLbl.Text = 'Timespan';
 tspanLbl.HorizontalAlignment = 'right';
@@ -57,27 +52,6 @@ t2.Limits = tspan;
 t2.LowerLimitInclusive = 'off';
 t2.ValueChangedFcn = @updatePlots;
 
-% replication slider
-if contains([s.name],'reps')
-reps = 1:reps;
-repLbl = uilabel(UIgrid);
-repLbl.Text = 'replication';
-repLbl.HorizontalAlignment = 'right';
-
-lbRep = uibutton(UIgrid);
-lbRep.Text = '<-';
-
-varDispRep = uieditfield(UIgrid,'numeric');
-varDispRep.Value = reps(1);
-varDispRep.UserData = struct('vars',reps,'currIdx',1);
-varDispRep.Editable = 'off';
-
-rbRep = uibutton(UIgrid);
-rbRep.Text = '->';
-
-lbRep.ButtonPushedFcn = {@sliderMoved, varDispRep};
-rbRep.ButtonPushedFcn = {@sliderMoved, varDispRep};
-end
 
 % Var sliders
 for i = 1:numVars
@@ -151,30 +125,19 @@ function updatePlots(~,~)
     %tic
     simIdx = find(ismember(var_combos,[varDisp(:).Value],'rows'));
 
-    if contains([s.name],'reps')
-        if simIdx ~= plotGrid.UserData.currSimIdx
-        load([pwd '/results/simResults' num2str(simIdx) '.mat'], 'simResults');
-        plotGrid.UserData.currSimIdx = simIdx;
+    if simIdx ~= plotGrid.UserData.currSimIdx
+        if ceil(simIdx/perBlock) ~= ceil(plotGrid.UserData.currSimIdx/perBlock)
+            load([pwd '/results/simResults' num2str(ceil(simIdx/perBlock)) '.mat'], 'simResults');
         end
 
-        for ii=1:numNeurons
-            vm = simResults(varDispRep.Value).data.(namesOfNeurons{ii});
-            plot(ax(ii),t,vm);
-            xlim(ax(ii),[t1.Value, t2.Value]);
-        end
-    else
-        if simIdx ~= plotGrid.UserData.currSimIdx
-        if ceil(simIdx/perBlk) ~= ceil(plotGrid.UserData.currSimIdx/perBlk)
-        load([pwd '/results/simResults' num2str(ceil(simIdx/perBlk)) '.mat'], 'simResults');
-        end
         plotGrid.UserData.currSimIdx = simIdx;
-        end
-
-        for ii=1:numNeurons
-            vm = simResults(1+mod(simIdx-1,perBlk)).data.(namesOfNeurons{ii});
-            plot(ax(ii),t,vm);
-            xlim(ax(ii),[t1.Value, t2.Value]);
-        end
+    end
+    
+    t = simResults(1+mod(simIdx-1,perBlock)).data.time;
+    for ii=1:numNeurons
+        vm = simResults(1+mod(simIdx-1,perBlock)).data.(namesOfNeurons{ii});
+        plot(ax(ii),t,vm);
+        xlim(ax(ii),[t1.Value, t2.Value]);
     end
     %toc
 end

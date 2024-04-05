@@ -1,9 +1,9 @@
 {
-  "minimal-style@@code-comment@@dark": "#7963C3",
-  "minimal-style@@code-string@@dark": "#DE7D00",
+  "minimal-style@@code-comment@@dark": "#605998",
+  "minimal-style@@code-string@@dark": "#FB9B5B",
   "minimal-style@@code-function@@dark": "#C7C7C7",
-  "minimal-style@@code-keyword@@dark": "#608DDA",
-  "minimal-style@@code-value@@dark": "#A2C99F",
+  "minimal-style@@code-keyword@@dark": "#1178AB",
+  "minimal-style@@code-value@@dark": "#A2C0C4",
   "minimal-style@@code-operator@@dark": "#C7C7C7",
   "minimal-style@@pdf-invert-dark": false,
   "minimal-style@@inline-title-size": "1.5em",

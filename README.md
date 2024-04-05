@@ -3,16 +3,15 @@ Repo for all TRN and TC neuron models
 
 ---
 
-# Setup
+# Julia Model
 
 ## Requirements 
 
-Git, if not installed. First time using git? -> [start here](https://docs.github.com/en/get-started/quickstart/set-up-git)
+Git, if not installed. First time using git? -> [start here](https://docs.github.com/en/get-started/quickstart/set-up-git) 
 
 Julia `ver 1.9+` -> [Julia setup](docs/Julia%20setup.md) 
 
 Matlab `R2023b`, latest release should work -> [Matlab setup](docs/matlab/Matlab%20setup.md)
-
 
 ## Usage 
 
@@ -60,7 +59,6 @@ git merge upstream/main
 remove accidental pushing to upstream
 `git remote set-url --push upstream no_push`
 
-
 ## Julia project environment setup
 
 Julia manages packages by environment so even though we added packages in the global environment during [Julia setup](docs/Julia%20setup.md) we will have to make sure model code dependencies are installed and precomiled for use in your project environment:
@@ -80,30 +78,49 @@ To start Julia in the project environment start with the project flag:
 
 `julia --project`
 
-
 ## Matlab code setup
-Open matlab and add the src/matlab folder to matlabs search path, do not add subfolders to the path. 
 
+Open matlab and add the 'matlab' folder to matlabs search path, do not add subfolders to the path. 
 
 ## Running simulations
 
-Creating sim run scripts -> [Run Script](Run%20Script.md)
+Creating sim run scripts -> [Run Script](docs/Run%20Script.md)
 
-To see the details of the model src start here -> [Julia Model](Julia%20Model.md)
 
-If working with the matlab model only start here -> [Matlab Model](Matlab%20Model.md)
+## Model Documentation
+
+Documentation was written and accessed offline through [obsidian](https://obsidian.md/), just add the cloned repo as a new vault. Docs can otherwise be viewed on Github, though some features may not render.
+
+To see the details of the model src start here -> [Julia Model](docs/Julia%20Model.md)
+
+| doc file                           | description                                                       | code file                                   |
+| ---------------------------------- | ----------------------------------------------------------------- | ------------------------------------------- |
+| [Run Script](docs/Run%20Script.md) | Script controlling variables and driving parallel simulation runs | [Run_dsim.m](../../matlab/model/Run_dsim.m) |
+|                                    |                                                                   |                                             |
+|                                    |                                                                   |                                             |
+|                                    |                                                                   |                                             |
 
 
 ---
 
-# Model Documentation
+# Matlab Model
 
-Documentation was written and intended to be opened in [obsidian](https://obsidian.md/), just add the cloned repo as a new vault. Docs can otherwise be viewed on Github, some links may be broken (such as the following dataview table:).
+## Requirements 
 
-Docs:
+Git, if not installed. First time using git? -> [start here](https://docs.github.com/en/get-started/quickstart/set-up-git) 
 
-```dataview
-TABLE
-FROM "docs"
-```
+Matlab `R2023b`, latest release should work -> [Matlab setup](docs/matlab/Matlab%20setup.md)
 
+## model usage 
+
+Start here -> [Matlab Model](docs/matlab/Matlab%20Model.md)
+
+## Matlab Documentation
+
+Documentation was written and accessed offline through [obsidian](https://obsidian.md/), just add the cloned repo as a new vault. Docs can otherwise be viewed on Github, though some features may not render.
+
+| doc file                              | description                                                       | code file                             |
+| ------------------------------------- | ----------------------------------------------------------------- | ------------------------------------- |
+| [Run_dsim](docs/matlab/Run_dsim.md)   | Script controlling variables and driving parallel simulation runs | [Run_dsim.m](matlab/model/Run_dsim.m) |
+| [dsim](docs/matlab/dsim.md)           | Function containing HH equations for model cells                  | [dsim.m](matlab/model/dsim.m)         |
+| [simParams](docs/matlab/simParams.md) | Object containing parameters for model cells                      | [simParams](matlab/model/simParams.m) |

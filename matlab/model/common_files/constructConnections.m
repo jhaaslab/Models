@@ -1,27 +1,25 @@
-function [connMat] = constructConnections(num_pairs,recip_prob,div_prob,mu_recip,mu_div,sig_recip,sig_div)
+function [connMat] = constructConnections(num_pairs,recip_prob,div_prob,A_mean,A_sig)
 %CONSTRUCTCONNECTIONS generate random synapses between TRN-TC networks
 %   Each possible location has prob of occuring, with recip_prob and 
 %   div_prob for connections between same cell pair and surrounding cells
 %   respectively. Synapse strength values are gaussian following mu,sig
-%   values. set sig = 0 for same strengths
+%   normalized to total number of synapses recieved by each cell.
 
 connMat = zeros(num_pairs);
 R=rand(size(connMat));
-R_A=randn(size(connMat));
 
 recipMat=diag(diag(R));
 recipMat(recipMat>1-recip_prob)=1;
 recipMat(recipMat<1-recip_prob)=0;
 
-A_recip = sig_recip.*R_A+mu_recip;
-recipMat = recipMat.*A_recip;
-
 divMat=R-diag(diag(R));
 divMat(divMat>1-div_prob)=1;
 divMat(divMat<1-div_prob)=0;
 
-A_div = sig_div.*R_A+mu_div;
-divMat = divMat.*A_div;
-
 connMat = recipMat+divMat;
+
+A_mat = A_sig.*randn(size(connMat)) + A_mean;
+
+connMat = (connMat.*A_mat) ./ sum(connMat);
+connMat = fillmissing(connMat,'constant',0);
 end

@@ -1,8 +1,13 @@
 #function
-link: [[dsim.m]]
+link: [dsim.m](../../matlab/model/dsim.m)
+
 This function contains the equations for calculating the Hodgkin-Huxley system and will be passed to the ODE solver to run our simulations 
 
 # Setup
+
+Initialize the output vector (ds).
+
+We then solve for each cell in the network.
 
 ```matlab
 function ds = dsim(t,s,sim)
@@ -17,7 +22,8 @@ v = s(idx+1);
 
 # Inputs
 
-To handle multiple input times we look for any time within the array of inputs by computing the dot product 
+We determine if there are any inputs to that cell at the current timestep. To handle multiple input times we look for any time within the array of inputs by computing the dot product.
+
 ```matlab
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Applied Current
 if any((sim.istart{i}<t) .* (t<sim.istop{i}))
@@ -44,6 +50,9 @@ end
 
 # Ion Channels
 
+Changes in channel gating (m, h) for all active channels are calculated from the [channel functions](#Channel-functions).
+
+We then calculate Channel currents at the current timestep.
 
 ```matlab
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Channels
@@ -91,7 +100,8 @@ end
 
 # Synapses
 
-Changes in synaptic conductance are calculated here while we iterate since the number of possible synapses increases with network size 
+Calculate synaptic currents to the cell at the current timestep. Changes in synaptic conductance are calculated here and not in [derivatives](#Derivatives) since the number of possible synapses increases with network size.
+
 ```matlab
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Synapses
 
@@ -138,7 +148,12 @@ end
 
 # Derivatives
 
-Changes in synaptic conductance are omitted here as we assigned them while iterating over the synapses in the network [(above)](#Synapses)
+Finally, we calculate change in voltage from the sum of the currents.
+
+Changes in channel actiavtions calculated [above](Ion-Channels) need to also be set to the ds.
+
+Changes in synaptic conductance are omitted here as we assigned them depending on cell identity [above](dsim.md#Synapses)
+ 
 ```matlab
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% final equations
 
@@ -158,7 +173,10 @@ end
 ```
 
 
-The following nested functions are the differential equations for channel activation (m) /inactivation (h) for all voltage dependent channels
+# Channel functions
+
+The following nested functions are the differential equations for channel activation (m) // inactivation (h) for all voltage dependent channels:
+
 ```matlab
 function [dm, dh]= Na_t(v, m, h)
     minf_nat = 1/(1 + exp((-v - 38)/10));
