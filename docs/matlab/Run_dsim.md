@@ -20,7 +20,7 @@ parpool('Threads');
 
 > [!todo]
 
-We also need to initialize some general run variables, most important here is to specify the length of the sim runs with 'startTime' and 'endTime', and specify cells that will be simulated. neuron naming should start with the cell type TRN or TC, a pair number, followed by an optional subtype identifier if used (ie. TRN1_PV, TRN2_SOM, TC1_MGB, TC2_HO ). A caveat of how the code is written is that TRN and TC layers need to be equal in size.
+We also need to initialize some general run variables, most important here is to specify the length of the sim runs with 'startTime' and 'endTime', and specify cells that will be simulated. neuron naming should start with the cell type TRN or TC, a pair number, followed by an optional subtype identifier if used (ie. TRN1_PV, TRN2_SOM, TC1_MGB, TC2_HO ).
 
 Initial conditions are now constructed based on network size, make sure to load the correct s_init file for either rest (s_init.m) or brought to -70 mv for noisy inputs (s_init_-70.m) 
 

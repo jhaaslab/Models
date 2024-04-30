@@ -4,12 +4,16 @@ parpool('Threads');
 % Simulation//Run variables
 namesOfNeurons = {'TRN1','TRN2',...
                   'TC1', 'TC2' };
+numNeurons = length(namesOfNeurons);
+nunTRN = sum(startsWith(namesOfNeurons,'TRN'));
+numTC  = sum(startsWith(namesOfNeurons,'TC'));
+
 startTime = 0;
 endTime   = 1000;
 tspan = [startTime endTime];
 
 load('s_init_-70.mat','s_init')
-s_init = [s_init zeros(1,length(namesOfNeurons)/2)];
+s_init = [s_init zeros(1,max([numTRN numTC]))];
 s0 = repmat(s_init,1,length(namesOfNeurons));
 
 per_neuron = length(s_init);

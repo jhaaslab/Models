@@ -86,7 +86,7 @@ if startsWith(sim.names{i},'TRN')
     %excitatory input TC
     Esyn2=0;
     for ii=1:sim.n_TC
-    ds(idx+14+ii) = sim.Te1*K_syn(s(sim.per_neuron*(ii+((sim.n/2)-1))+1))...
+    ds(idx+14+ii) = sim.Te1*K_syn(s(sim.per_neuron*(ii+((sim.n_TRN)-1))+1))...
                     *(1-s(idx+14+ii)) - sim.Te2*s(idx+14+ii); 
     Esyn2 = Esyn2 + sim.A_TC(ii,i) * s(idx+14+ii) * (v-sim.E_AMPA);
     end
@@ -107,7 +107,7 @@ else %%% TC
     for ii=1:sim.n_TRN
     ds(idx+14+ii) = sim.Ti1*K_syn(s(sim.per_neuron*(ii-1)+1))...
                     *(1-s(idx+14+ii)) - sim.Ti2*s(idx+14+ii); 
-    Isyn2 = Isyn2 + sim.AI_TRN(ii,i-(sim.n/2)) * s(idx+14+ii) * (v-sim.E_GABA);
+    Isyn2 = Isyn2 + sim.AI_TRN(ii,i-(sim.n_TRN)) * s(idx+14+ii) * (v-sim.E_GABA);
     end
 
     Summed_Isyn = Esyn1 + Isyn1 + Isyn2;

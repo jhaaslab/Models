@@ -89,8 +89,8 @@ classdef simParams
                 sp.GtACR_on(1:sp.n)  = {0};
                 sp.GtACR_off(1:sp.n) = {0};
 
-                sp.A_TC   = zeros(sp.n_TC);
-                sp.AI_TRN = zeros(sp.n_TRN);
+                sp.A_TC   = zeros(sp.n_TC,sp.n_TRN);
+                sp.AI_TRN = zeros(sp.n_TRN,sp.n_TC);
 
                 sp.gj = zeros(sp.n_TRN);
             end
