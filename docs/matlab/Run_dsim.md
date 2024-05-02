@@ -238,20 +238,20 @@ Connectivity is represented by a matrix of amplitudes, or Gcs' for gap junctions
 ```matlab
 Gc = 0.01;
 sim.gj = [0 Gc
-		  Gc 0];
+          Gc 0];
 ```
 
 ```matlab
-sim.A_TC   = constructConnections(sim.n_TC,recip_prob,div_prob,meanAmp,sigAmp);
+sim.A_TC   = constructConnections(sim.n_TC,sim.n_TRN,recip_prob,div_prob,meanAmp,sigAmp);
 
-sim.AI_TRN = constructConnections(sim.n_TRN,recip_prob,div_prob,meanAmp,sigAmp);
+sim.AI_TRN = constructConnections(sim.n_TRN,sim.n_TC, recip_prob,div_prob,meanAmp,sigAmp);
 
 sim.gj = constructGJ(sim.n_TRN,meanGc,sigGc);
 ```
 
 # Solve ODEs
 
-we call our ode solver with an '@' function handle broadcast over variables (t,s) passed to our [[dsim]] function, dsim also takes [[simParams]] input to extract all parameters for the run. t =timepoints of the solution, s = solutions to all differential equations at each value of t
+we call our ode solver with an '@' function handle broadcast over variables (t,s) passed to our [[dsim]] function, dsim also takes [[simParams]] input to extract all parameters for the run. t = timepoints of the solution, s = solutions to all differential equations at each value of t
 ode function also needs 
 - timespan 
 - initial conditions, we stored these in sim.s0
