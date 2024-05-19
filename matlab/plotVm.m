@@ -132,12 +132,13 @@ function updatePlots(~,~)
 
         plotGrid.UserData.currSimIdx = simIdx;
     end
-    
+
     t = simResults(1+mod(simIdx-1,perBlock)).data.time;
     for ii=1:numNeurons
         vm = simResults(1+mod(simIdx-1,perBlock)).data.(namesOfNeurons{ii});
         plot(ax(ii),t,vm);
         xlim(ax(ii),[t1.Value, t2.Value]);
+        ylim(ax(ii),[-100, 50]);
     end
     %toc
 end
