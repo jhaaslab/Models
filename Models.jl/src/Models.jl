@@ -11,8 +11,7 @@ using Peaks, NaNStatistics, DSP
 # Run helper functions:
 #------------------------------------------------------------
 include("RunUtils.jl")
-export allcombinations, psthFR, findspks
-export constructResults, simVars, simResults, spkData
+export allcombinations, psthFR, findspks, simResults, spkData
 #------------------------------------------------------------
 
 #------------------------------------------------------------
@@ -46,8 +45,7 @@ module TRNmodel
 using Models
 
 export dsim!, simParams, initialconditions
-export allcombinations, constructResults,simVars, simResults, spkData 
-export findspks, psthFR
+export allcombinations, findspks, psthFR, simResults, spkData
 
 include("TRNmodel.jl")
 
@@ -61,8 +59,7 @@ using Models
 
 export dsim!, simParams, initialconditions
 export poissonP, constructGJ
-export allcombinations, constructResults,simVars, simResults, spkData 
-export findspks, psthFR
+export allcombinations, findspks, psthFR, simResults, spkData
 
 include("TRNnetwork.jl")
 
@@ -76,8 +73,7 @@ using Models
 
 export dsim!, simParams, initialconditions
 export poissonP, constructGJ, constructConnections
-export allcombinations, constructResults,simVars, simResults, spkData 
-export findspks, psthFR
+export allcombinations, findspks, psthFR, simResults, spkData
 
 include("TC_TRNnetwork.jl")
 

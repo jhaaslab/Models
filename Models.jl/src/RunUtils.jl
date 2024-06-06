@@ -34,27 +34,6 @@ function psthFR(spks::Vector{Float64},tspan::Integer,n_trials::Integer,win_width
     return centers, psth
 end # return_psth
 
-function constructResults(u, Params)
-    numNeurons = axes(u,1)
-    numSims = axes(u,3)
-    vmdata = @views u
-
-    D_results = Vector{Dict}(undef,length(numSims))
-
-    for i in numSims
-        #vmdata = @views u[:,:,i]
-        vm = [vmdata[n,:,i] for n in numNeurons]
-
-        D_results[i] = Dict("rep" => i,
-            "simParams" => Params[i],
-            "data" => Dict(zip(Params[i].names,vm)))
-    end
-
-    simResults = Dict("simResults"=>D_results)
-
-    return simResults
-end
-
 struct simResults
     rep::Int64
     data::Dict{String, Vector{Float64}}
@@ -72,7 +51,7 @@ struct spkData
     function spkData(names::Vector{String},spks::Matrix{Vector{Float64}},FR::Matrix{Float64})
         spktime = Dict(zip(names,[spks[i,:] for i in eachindex(names)]))
 
-        FR = Dict(zip(names,[]FR))
+        FR = Dict(zip(names,[FR[i,:] for i in eachindex(names)]))
         new(spktime,FR)
     end
 end

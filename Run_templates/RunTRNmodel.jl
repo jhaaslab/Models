@@ -1,7 +1,7 @@
 
 using Models.TRNmodel
 using OrdinaryDiffEq
-using MAT
+using JLD2, MAT
 
 # main program
 function main()
@@ -10,7 +10,6 @@ namesOfNeurons = ["TRN$i" for i in 1:1]
 numNeurons = length(namesOfNeurons)
 startTime  = 0
 endTime    = 1000
-tspan = (startTime, endTime)
 dt = 0.1
 
 ## Initial conditions
@@ -24,28 +23,36 @@ var_combos = allcombinations(var_, )
 
 ## Save//Run vars
 perBlk = 150
+
 numBlks = Int(ceil(length(var_combos)/perBlk))
 
 allBlks = [var_combos[(1:perBlk).+(perBlk*(i-1))] for i in 1:numBlks-1]
 allBlks = vcat(allBlks, [var_combos[1+(perBlk*(numBlks-1)):end]])
 
 
-savepath = joinpath(pwd(),"results")
-if ~isdir(savepath)
-    mkdir(savepath)
+varpath = joinpath(pwd(),"vars")
+if ~isdir(varpath)
+    mkdir(varpath)
 
     tmpBlk = 1
-    matwrite(joinpath(savepath,"tmpBlk.mat"),Dict("tmpBlk"=>tmpBlk))
+    save_object(joinpath(varpath,"tmpBlk.jld2"),tmpBlk)
 
     D_vars = Dict("namesOfNeurons"=>namesOfNeurons,
-        "tspan"=>collect(tspan), "dt"=>dt,
-        "var_names"=>var_names, "perBlk"=>convert(Float64,perBlk),
-        "var_combos"=>[tup[k] for tup in var_combos, k in 1:length(var_names)])
-    matwrite(joinpath(savepath,"sim_vars.mat"),D_vars)
+        "tspan"=>[convert(Float64,startTime), convert(Float64,endTime)],
+        "dt"=>dt,
+        "var_names"=>var_names,
+        "perBlk"=>convert(Float64,perBlk),
+        "var_combos"=>[convert(Float64,tup[k]) for tup in var_combos, k in 1:length(var_names)])
+    matwrite(joinpath(varpath,"sim_vars.mat"),D_vars)
 else
-    D = matread(joinpath(savepath,"tmpBlk.mat"))
-    tmpBlk = D["tmpBlk"]
+    tmpBlk = load_object(joinpath(varpath,"tmpBlk.jld2"))
 end
+
+resultspath = joinpath(pwd(),"results")
+if ~isdir(resultspath)
+    mkdir(resultspath)
+end
+
 
 # Start running blocks
 while tmpBlk <= numBlks
@@ -55,7 +62,6 @@ while tmpBlk <= numBlks
 
     ## Initialize simParams
     Params = Vector{simParams}(undef,numSims)
-
     for i = 1:numSims
         p = simParams(names=namesOfNeurons,n=numNeurons,per_neuron=per_neuron)
 
@@ -64,35 +70,38 @@ while tmpBlk <= numBlks
 
         # Vars
         ## Inputs
-        for ii = 1:p.n
+        for n=1:p.n
             ### DC
-            p.bias[ii] = iDC
+            p.bias[n] = iDC
         end
 
         Params[i] = p
     end
 
-    u = zeros(numNeurons,length(startTime:dt:endTime),numSims)
+    save_object(joinpath(varpath,"simParams$tmpBlk.jld2"),Params)
 
+    # Run sims in parallel
+    Results = Vector{simResults}(undef,numSims)
     @time Threads.@threads for i = 1:numSims
 
         p = Params[i]
 
-        prob = ODEProblem(dsim!,u0,tspan,p)
+        prob = ODEProblem(dsim!,u0,(startTime,endTime),p)
 
         # Start sim
         sol = solve(prob,BS3(),saveat=dt,save_idxs=1:p.per_neuron:length(u0))
 
-        u[:,:,i]=sol[1:p.n,:]
+        vm = sol[1:p.n,:]
+
+        # Store Vm data
+        Results[i] = simResults(namesOfNeurons,vm,i)
     end
 
-    # Save Vm data
-    simResults = constructResults(u,Params)
-
-    matwrite(joinpath(savepath,"simResults$tmpBlk.mat"),simResults)
+    # save Vm data
+    matwrite(joinpath(resultspath,"simResults$tmpBlk.mat"),Dict("simResults"=>Results))
 
     tmpBlk += 1
-    matwrite(joinpath(savepath,"tmpBlk.mat"),Dict("tmpBlk"=>tmpBlk))
+    save_object(joinpath(varpath,"tmpBlk.jld2"),tmpBlk)
 end
 
 return nothing

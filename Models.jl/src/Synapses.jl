@@ -1,9 +1,5 @@
 
-function K_syn(v)
-    k = 1.0/(1.0+exp(-(v+50.0)/2.0))
-
-    return k
-end
+K_syn(v) = 1.0/(1.0+exp(-(v+50.0)/2.0))
 
 function poissonP(r,T)
     # Poisson process for generating stochastic spike trains
@@ -16,11 +12,13 @@ function poissonP(r,T)
     return tspks
 end
 
-function constructGJ(num_TRN,mu_gc,sig_gc)
+function constructGJ(num_TRN,mu_gc,sig_gc,norm=true)
     # generate random coupling within TRN network
     # Each cell makes 1-3 connections with P 0.45 0.5 0.05 respectively
     # P synapse will favor cells with no GJs (0.2 bias)
     # Coupling strength values are gaussian following mu,sig
+    # normalized to total number of synapses recieved by each cell.
+
     if sig_gc > mu_gc
         error("sigma larger than mean Gc, use a smaller value to prevent negative values")
     end
@@ -61,10 +59,18 @@ function constructGJ(num_TRN,mu_gc,sig_gc)
 
     gjMat = UpperTriangular(gjMat)
 
-    gc = sig_gc.*randn(size(gjMat)).+mu_gc
-    gjMat = gjMat.*gc
+    gcMat = sig_gc.*randn(size(gjMat)).+mu_gc
+    gcMat = gjMat.*gcMat
 
-    gjMat = gjMat+gjMat'
+    gcMat = gcMat+gcMat'
+
+    if norm==true
+        gjMat = gjMat+gjMat'
+        gjMat = gcMat ./ sum(gjMat,dims=1)
+        gjMat[isnan.(gjMat)].=0
+    else
+        gjMat=gcMat
+    end
 
     return gjMat
 end #constructGJ
@@ -75,6 +81,7 @@ function constructConnections(num_pairs,recip_prob,div_prob,A_mean,A_sig)
     # div_prob for connections between same cell pair and surrounding cells
     # respectively. Synapse strength values are gaussian following mu, sig,
     # normalized to total number of synapses recieved by each cell.
+
     if A_sig > A_mean
         error("sigma larger than mean, use a smaller value to prevent negative values")
     end

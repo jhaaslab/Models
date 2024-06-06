@@ -37,6 +37,11 @@ for n in eachindex(numNeurons)
         Params[i] = p
     end
 
+    if n == 1
+    dry_run=ODEProblem(dsim!, u0, tspan, Params[1])
+    @time solve(dry_run,BS3(),save_everystep=false,save_idxs=1:Params[1].per_neuron:length(u0))
+    end
+
     tlocal[n] = @elapsed Threads.@threads for i = 1:reps
         p = Params[i]
 
@@ -51,6 +56,7 @@ matwrite(joinpath(pwd(),"texec_model_nonoise.mat"),Dict("tlocal"=>tlocal))
 
 =#
 
+#
 using Models.TC_TRNnetwork
 using OrdinaryDiffEq
 using MAT
@@ -62,9 +68,7 @@ tspan = (startTime, endTime)
 numNeurons = [collect(2:2:18); 100]
 
 reps = 100
-
 tlocal = zeros(length(numNeurons))
-
 for n in eachindex(numNeurons)
     namesOfNeurons = [["TRN$i" for i in 1:div(numNeurons[n],2)]; ["TC$i" for i in 1:div(numNeurons[n],2)]]
     ## Initial conditions
@@ -81,13 +85,18 @@ for n in eachindex(numNeurons)
         for ii = 1:p.n
             p.bias[ii] = 0.3
             # noise
-            p.A[ii] = 0.5
             p.tA[ii] = poissonP(80,endTime)
-            p.AI[ii] = 0.5
+            p.A[ii] = [0.5 for i in 1:length(p.tA[ii])]
             p.tAI[ii] = poissonP(20,endTime)
+            p.AI[ii] = [0.5 for i in 1:length(p.tAI[ii])]
         end
 
         Params[i] = p
+    end
+
+    if n == 1
+    dry_run=ODEProblem(dsim!, u0, tspan, Params[1])
+    @time solve(dry_run,VCAB3(),save_everystep=false,save_idxs=1:Params[1].per_neuron:length(u0))
     end
 
     tlocal[n] = @elapsed Threads.@threads for i = 1:reps
@@ -96,12 +105,11 @@ for n in eachindex(numNeurons)
         prob = ODEProblem(dsim!, u0, tspan, p)
 
         # Start sim
-        solve(prob,BS3(),save_everystep=false,save_idxs=1:p.per_neuron:length(u0))
+        solve(prob,VCAB3(),save_everystep=false,save_idxs=1:p.per_neuron:length(u0))
     end
 end
 
 matwrite(joinpath(pwd(),"texec_TC_TRNnet_noise.mat"),Dict("tlocal"=>tlocal))
-
 
 
 
@@ -130,6 +138,11 @@ for n in eachindex(numNeurons)
         Params[i] = p
     end
 
+    if n == 1
+    dry_run=ODEProblem(dsim!, u0, tspan, Params[1])
+    @time solve(dry_run,BS3(),save_everystep=false,save_idxs=1:Params[1].per_neuron:length(u0))
+    end
+
     tlocal[n] = @elapsed Threads.@threads for i = 1:reps
         p = Params[i]
 
@@ -139,10 +152,9 @@ for n in eachindex(numNeurons)
         solve(prob,BS3(),save_everystep=false,save_idxs=1:p.per_neuron:length(u0))
     end
 end
-
 matwrite(joinpath(pwd(),"texec_TC_TRNnet_nonoise.mat"),Dict("tlocal"=>tlocal))
 
-
+#
 nothing
 end #main
 

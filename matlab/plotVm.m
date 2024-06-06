@@ -1,5 +1,5 @@
 function plotVm
-% PLOTFR Interactive plotter for FR/Raster data from simulations
+% PLOTVM Interactive plotter for FR/Raster data from simulations
 if ~isfolder('results')
     error(['results not found in current working directory. '...
      'cd to sim directory and ensure sims ran and saved to results folder.'])
