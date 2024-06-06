@@ -1,5 +1,5 @@
 
-function calcUinit(namesOfNeurons,gj,g_L,bias)
+function calcUinit(namesOfNeurons,gj,g_L)
 
 # Simulation//Run variables
 numNeurons = length(namesOfNeurons)
@@ -13,9 +13,8 @@ u0, per_neuron = initialconditions(numNeurons,false)
 ## vars
 var_Gc_idx  = axes(gj,1)
 var_net_idx = axes(gj,2)
-var_bias_tf = (0, 1)
 
-var_combos = allcombinations(var_Gc_idx,var_net_idx,var_bias_tf)
+var_combos = allcombinations(var_Gc_idx,var_net_idx)
 
 ## Save//Run vars
 numSims = length(var_combos)
@@ -27,7 +26,7 @@ Params = Vector{simParams}(undef,numSims)
 
 for i = 1:numSims
 
-    Gc_idx, net_idx, bias_tf = var_combos[i]
+    Gc_idx, net_idx = var_combos[i]
 
     p = simParams(names=namesOfNeurons,n=numNeurons,per_neuron=per_neuron)
 
@@ -35,10 +34,6 @@ for i = 1:numSims
     p.g_L = g_L[Gc_idx,net_idx]
 
     ## Inputs
-    ### DC
-    if bias_tf == 1
-        p.bias = bias[Gc_idx,net_idx]
-    end
 
     ## Synapses
     p.gj = gj[Gc_idx,net_idx]
@@ -61,14 +56,10 @@ u = zeros(numNeurons*per_neuron,numSims)
 end
 
 # Save initial conditions
-uinit_0 = [u[:,i] for i = 1:div(numSims,2)]
+uinit_0 = [u[:,i] for i = 1:numSims]
 uinit_0 = reshape(uinit_0, (numGc,numNets))
 
-uinit_bias = [u[:,i] for i = 1+div(numSims,2):numSims]
-uinit_bias = reshape(uinit_bias, (numGc,numNets))
-
 uinit = Dict("uinit_0"=>uinit_0,
-             "uinit_bias"=>uinit_bias,
              "per_neuron"=>per_neuron)
 
 return uinit

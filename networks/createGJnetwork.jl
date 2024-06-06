@@ -11,8 +11,8 @@ include("run_scripts/calcUinit.jl")
 include("run_scripts/calcCC.jl")
 
 # Functions
-gL_func(x) = 0.1 .- 0.9773x .+ 6.33x.^2
-gL_adj(x)  = 0.0001.*(-0.2243 .- 254.5x .+ 35.73x.^2 .- 2.59x.^3)
+gL_func(Gc) = 0.1 .- 0.9773Gc .+ 6.33Gc.^2
+gL_adj(dRin)= 0.0001.*(-0.2243 .- 254.5dRin .+ 35.73dRin.^2 .- 2.59dRin.^3)
 
 
 # main program
@@ -20,31 +20,45 @@ function main()
 # vars
 namesOfNeurons = ["TRN$i" for i in 1:9]
 numNeurons = length(namesOfNeurons)
-allGc = 0.005:0.005:0.03
-numGc = length(allGc)
-Gc_sig = 0
+meanGc  = 0.005:0.005:0.03
+numGc   = length(meanGc)
+all_sigGc = 0.0:0.001:0.005
 numNets = 50
 
 Rin_tgt = 6.239
 vm_tgt  = -70
 
+for sigGc in all_sigGc
 
-savepath = joinpath(pwd(),"ring")
+savepath = joinpath(pwd(),"rand_sig_0_00$(Int(sigGc*1000))")
 if ~isdir(savepath)
     mkdir(savepath)
 
-    jldsave(joinpath(savepath,"net_vars.jld2");namesOfNeurons,allGc,numNets)
+    jldsave(joinpath(savepath,"net_vars.jld2");namesOfNeurons,meanGc,sigGc,numNets)
+
+    gj   = fill(zeros(numNeurons,numNeurons),(numGc,numNets))
+    g_L  = fill(zeros(numNeurons),(numGc,numNets))
+    Rin  = fill(zeros(numNeurons),(numGc,numNets))
+
+    save_object(joinpath(savepath,"gj.jld2"), gj)
+    save_object(joinpath(savepath,"g_L.jld2"),g_L)
+    save_object(joinpath(savepath,"Rin.jld2"),Rin)
+
+    saveBlk = 1
+    save_object(joinpath(savepath,"saveBlk.jld2"),saveBlk)
+else
+    gj  = load_object(joinpath(savepath,"gj.jld2"))
+    g_L = load_object(joinpath(savepath,"g_L.jld2"))
+    Rin = load_object(joinpath(savepath,"Rin.jld2"))
+
+    saveBlk = load_object(joinpath(savepath,"saveBlk.jld2"))
 end
 
-gj   = fill(zeros(numNeurons,numNeurons),(numGc,numNets))
-g_L  = fill(zeros(numNeurons),(numGc,numNets))
-Rin  = fill(zeros(numNeurons),(numGc,numNets))
-
 # Iterate networks
-for m=1:numGc
-    Gc = allGc[m]
+while saveBlk <= numGc
+    Gc = meanGc[saveBlk]
     for n=1:numNets
-        gj_tmp = constructGJ(numNeurons,Gc,Gc_sig);
+        gj_tmp = constructGJ(numNeurons,Gc,sigGc)
 
         #Estimate Rin adjust
         g_L_tmp = gL_func(vec(sum(gj_tmp,dims=1)'))
@@ -63,24 +77,26 @@ for m=1:numGc
             Rin_diff = Rin_tmp.-Rin_tgt
         end
 
-        gj[m,n]  = gj_tmp
-        g_L[m,n] = g_L_tmp
-        Rin[m,n] = Rin_tmp
+        gj[saveBlk,n]  = gj_tmp
+        g_L[saveBlk,n] = g_L_tmp
+        Rin[saveBlk,n] = Rin_tmp
     end
+
+    save_object(joinpath(savepath,"gj.jld2"), gj)
+    save_object(joinpath(savepath,"g_L.jld2"),g_L)
+    save_object(joinpath(savepath,"Rin.jld2"),Rin)
+
+    saveBlk += 1
+    save_object(joinpath(savepath,"saveBlk.jld2"),saveBlk)
 end
-
-save_object(joinpath(savepath,"gj.jld2"), gj)
-save_object(joinpath(savepath,"g_L.jld2"),g_L)
-save_object(joinpath(savepath,"Rin.jld2"),Rin)
-
 
 # Calculate bias current
 bias = calcBias(namesOfNeurons,gj,g_L,vm_tgt)
 
 save_object(joinpath(savepath,"bias.jld2"),bias)
 
-# Recalculate initial conditions
-uinit = calcUinit(namesOfNeurons,gj,g_L,bias)
+# Recalculate Rest
+uinit = calcUinit(namesOfNeurons,gj,g_L)
 
 save_object(joinpath(savepath,"uinit.jld2"),uinit)
 
@@ -88,6 +104,7 @@ save_object(joinpath(savepath,"uinit.jld2"),uinit)
 cc = calcCC(namesOfNeurons,gj,g_L,uinit)
 
 save_object(joinpath(savepath,"cc.jld2"),cc)
+end
 
 return nothing
 end #main
