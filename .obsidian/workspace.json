@@ -1,14 +1,14 @@
 {
   "main": {
-    "id": "88d4b17d6a86c3cb",
+    "id": "3eff1982cb65c01e",
     "type": "split",
     "children": [
       {
-        "id": "2f7cdbe38cbd0a6d",
+        "id": "1721b98db39a5f2a",
         "type": "tabs",
         "children": [
           {
-            "id": "2dfc1de21bc1b4e2",
+            "id": "d88389588433a9b9",
             "type": "leaf",
             "pinned": true,
             "state": {
@@ -18,7 +18,9 @@
                 "mode": "source",
                 "source": false
               },
-              "pinned": true
+              "pinned": true,
+              "icon": "lucide-file",
+              "title": "README"
             }
           }
         ]
@@ -27,25 +29,28 @@
     "direction": "vertical"
   },
   "left": {
-    "id": "c6c6347657f7b484",
+    "id": "51987c917add141f",
     "type": "split",
     "children": [
       {
-        "id": "eb09344fe2b40567",
+        "id": "a4bbd68f42bc5542",
         "type": "tabs",
         "children": [
           {
-            "id": "4397f3a8eb72ac78",
+            "id": "447e0037e4c5394a",
             "type": "leaf",
             "state": {
               "type": "file-explorer",
               "state": {
-                "sortOrder": "alphabetical"
-              }
+                "sortOrder": "alphabetical",
+                "autoReveal": false
+              },
+              "icon": "lucide-folder-closed",
+              "title": "Files"
             }
           },
           {
-            "id": "37c1c4eb926d8784",
+            "id": "aad229a968e1010d",
             "type": "leaf",
             "state": {
               "type": "search",
@@ -56,15 +61,19 @@
                 "collapseAll": false,
                 "extraContext": false,
                 "sortOrder": "alphabetical"
-              }
+              },
+              "icon": "lucide-search",
+              "title": "Search"
             }
           },
           {
-            "id": "038948cb737078da",
+            "id": "b838531b1fc27fae",
             "type": "leaf",
             "state": {
               "type": "bookmarks",
-              "state": {}
+              "state": {},
+              "icon": "lucide-bookmark",
+              "title": "Bookmarks"
             }
           }
         ]
@@ -74,15 +83,27 @@
     "width": 200
   },
   "right": {
-    "id": "639ac4921454c6d4",
+    "id": "1c97291eb9e584ea",
     "type": "split",
     "children": [
       {
-        "id": "63f58457741cdc8e",
+        "id": "ed7f0aea053e18fa",
         "type": "tabs",
         "children": [
           {
-            "id": "b41959e5365418be",
+            "id": "984ff37f69a632bf",
+            "type": "leaf",
+            "pinned": true,
+            "state": {
+              "type": "graph",
+              "state": {},
+              "pinned": true,
+              "icon": "lucide-git-fork",
+              "title": "Graph view"
+            }
+          },
+          {
+            "id": "8eaa082b64d7ba65",
             "type": "leaf",
             "state": {
               "type": "backlink",
@@ -95,11 +116,13 @@
                 "searchQuery": "",
                 "backlinkCollapsed": false,
                 "unlinkedCollapsed": true
-              }
+              },
+              "icon": "links-coming-in",
+              "title": "Backlinks for README"
             }
           },
           {
-            "id": "74958f6ebfee2e36",
+            "id": "dfd8c6954e8c6647",
             "type": "leaf",
             "state": {
               "type": "outgoing-link",
@@ -107,114 +130,73 @@
                 "file": "README.md",
                 "linksCollapsed": false,
                 "unlinkedCollapsed": true
-              }
+              },
+              "icon": "links-going-out",
+              "title": "Outgoing links from README"
             }
           },
           {
-            "id": "ac0b709e288cf5ab",
+            "id": "f705bb5f282d746b",
             "type": "leaf",
             "state": {
               "type": "tag",
               "state": {
                 "sortOrder": "frequency",
-                "useHierarchy": true
-              }
+                "useHierarchy": true,
+                "showSearch": false,
+                "searchQuery": ""
+              },
+              "icon": "lucide-tags",
+              "title": "Tags"
             }
-          },
+          }
+        ]
+      },
+      {
+        "id": "e3581184cd0fe0a3",
+        "type": "tabs",
+        "children": [
           {
-            "id": "1f2ba197aeedfc62",
+            "id": "bdfecafbdca70acf",
             "type": "leaf",
+            "pinned": true,
             "state": {
               "type": "outline",
               "state": {
-                "file": "README.md"
-              }
-            }
-          },
-          {
-            "id": "4b347cbae704ef85",
-            "type": "leaf",
-            "state": {
-              "type": "all-properties",
-              "state": {
-                "sortOrder": "frequency",
+                "file": "README.md",
+                "followCursor": false,
                 "showSearch": false,
                 "searchQuery": ""
-              }
-            }
-          },
-          {
-            "id": "a956078f02894409",
-            "type": "leaf",
-            "state": {
-              "type": "git-view",
-              "state": {}
-            }
-          },
-          {
-            "id": "84ab996fe1ce2730",
-            "type": "leaf",
-            "state": {
-              "type": "git-history-view",
-              "state": {}
+              },
+              "pinned": true,
+              "icon": "lucide-list",
+              "title": "Outline of README"
             }
           }
-        ],
-        "currentTab": 3
+        ]
       }
     ],
     "direction": "horizontal",
-    "width": 300,
-    "collapsed": true
+    "width": 325.5
   },
   "left-ribbon": {
     "hiddenItems": {
-      "switcher:Open quick switcher": false,
       "graph:Open graph view": false,
+      "switcher:Open quick switcher": false,
       "canvas:Create new canvas": false,
       "daily-notes:Open today's daily note": false,
       "templates:Insert template": false,
       "command-palette:Open command palette": false
     }
   },
-  "active": "2dfc1de21bc1b4e2",
+  "active": "d88389588433a9b9",
   "lastOpenFiles": [
     "README.md",
-    "docs/matlab/Run_dsim.md",
-    "docs/matlab/Matlab setup.md",
-    "docs/matlab/Matlab Model.md",
     "docs/Julia setup.md",
-    "docs/Julia examples.md",
-    "docs/Julia Model.md",
-    "docs/TRNmodel.md",
-    "docs/Synapse construction.md",
     "docs/Run Script.md",
-    "docs/matlab/dsim.md",
-    "docs/matlab/simParams.md",
-    "Models.jl/src/Synapses.jl~",
-    "Models.jl/src/4913",
-    "Run_templates/Run_simple.jl~",
-    "Run_templates/4913",
-    "simulations/test2/results/simResults1.mat",
-    "simulations/test2/results",
-    "simulations/test2/vars/RNG_seed.mat",
-    "simulations/test2/vars/tmpBlock.mat",
-    "simulations/test2/vars/sim_vars.mat",
-    "simulations/test2/vars",
-    "docs/matlab/ExtractData.md",
-    "docs/matlab/Plotting tools.md",
-    "docs/matlab/poissonP.md",
-    "docs/matlab/Parallel pool.md",
-    "docs/Run_dsim.md",
-    "docs/Matlab setup.md",
-    "docs/Modules.md",
-    "poissonP.md",
-    "Run_dsim.md",
-    "dsim.md",
-    "Julia setup.md",
-    "Matlab setup.md",
-    "Parallel pool.md",
-    "Code/Matlab/benchmark.jpg",
-    "Untitled.canvas"
+    "docs/Synapse construction.md",
+    "docs/TRNmodel.md",
+    "docs/Julia Model.md",
+    "docs/Julia examples.md"
   ]
 }
