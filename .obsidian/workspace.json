@@ -15,8 +15,8 @@
               "type": "markdown",
               "state": {
                 "file": "README.md",
-                "mode": "source",
-                "source": false
+                "mode": "preview",
+                "source": true
               },
               "pinned": true,
               "icon": "lucide-file",
@@ -191,12 +191,12 @@
   },
   "active": "d88389588433a9b9",
   "lastOpenFiles": [
-    "README.md",
-    "docs/Julia setup.md",
-    "docs/Run Script.md",
-    "docs/Synapse construction.md",
     "docs/TRNmodel.md",
+    "docs/Synapse construction.md",
+    "docs/Julia setup.md",
     "docs/Julia Model.md",
-    "docs/Julia examples.md"
+    "docs/Julia examples.md",
+    "docs/Run Script.md",
+    "README.md"
   ]
 }

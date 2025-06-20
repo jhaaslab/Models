@@ -1,5 +1,9 @@
 {
   "newFileLocation": "folder",
   "newFileFolderPath": "docs",
-  "attachmentFolderPath": "attachments"
+  "attachmentFolderPath": "attachments",
+  "useMarkdownLinks": true,
+  "newLinkFormat": "absolute",
+  "strictLineBreaks": true,
+  "defaultViewMode": "preview"
 }
