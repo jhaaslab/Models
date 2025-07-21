@@ -1,84 +1,36 @@
 module Models
+
 # dependencies
-## external
+using OrdinaryDiffEq
 using Statistics
 using Random
 using LinearAlgebra
 using Peaks, NaNStatistics, DSP
+using JLD2, MAT
+using ProgressMeter
 
-## self defined -- top level deps
-#------------------------------------------------------------
-# Run helper functions:
-#------------------------------------------------------------
-include("RunUtils.jl")
-export allcombinations, psthFR, findspks, simResults, spkData
-#------------------------------------------------------------
+export poisson_process, construct_gj_net, construct_syn_net
+export psth
 
-#------------------------------------------------------------
-#Channel functions
-#------------------------------------------------------------
-include("Channels.jl")
-export Na_t, Na_p, K_rect, K_A, K2, Ca_T, AR
-#------------------------------------------------------------
+include("runutils.jl")
+include("channels.jl")
+include("inputs.jl")
+include("synapses.jl")
 
-#------------------------------------------------------------
-#Input functions
-#------------------------------------------------------------
-include("Inputs.jl")
-export Iapp_f, ExtSyn_f, GtACR_f, Gsyn_f
-#------------------------------------------------------------
+export Model,
+    TRNmodel,
+    TRNnetwork,
+    TCnetwork
 
-#------------------------------------------------------------
-#Synapse functions
-#------------------------------------------------------------
-include("Synapses.jl")
-export K_syn, poissonP, constructGJ, constructConnections
-#------------------------------------------------------------
-
-
-#------------------------------------------------------------
-# Model constructs
-#------------------------------------------------------------
-## TRNmodel, dep: Models
-module TRNmodel
-
-using Models
-
-export dsim!, simParams, initialconditions
-export allcombinations, findspks, psthFR, simResults, spkData
+abstract type Model end
+Base.copy(x::Model) where Model = Model([deepcopy(getfield(x, k)) for k ∈ fieldnames(Model)]...)
 
 include("TRNmodel.jl")
-
-end #module TRNmodel
-#------------------------------------------------------------
-
-## TRNnetwork, dep: Models
-module TRNnetwork
-
-using Models
-
-export dsim!, simParams, initialconditions
-export poissonP, constructGJ
-export allcombinations, findspks, psthFR, simResults, spkData
-
 include("TRNnetwork.jl")
+include("TCnetwork.jl")
 
-end #module TRNnetwork
-#------------------------------------------------------------
+export runsim, RunVars
 
-## TC_TRNnetwork, dep: Models
-module TC_TRNnetwork
-
-using Models
-
-export dsim!, simParams, initialconditions
-export poissonP, constructGJ, constructConnections
-export allcombinations, findspks, psthFR, simResults, spkData
-
-include("TC_TRNnetwork.jl")
-
-end #module TC_TRNnetwork
-#------------------------------------------------------------
-
+include("runsim.jl")
 
 end #module Models

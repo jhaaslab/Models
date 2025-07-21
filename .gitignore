@@ -1,2 +1,6 @@
+.trash
+.obsidian
+startup.m
 simResults*
-simParams*
+VmData*
+FRData*

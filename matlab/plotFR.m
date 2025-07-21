@@ -2,11 +2,40 @@ function plotFR
 % PLOTFR Interactive plotter for FR/Raster data from simulations
 if ~isfolder('data')
     error(['data not found in current working directory. '...
-     'cd to sim directory and ensure sim data was extracted.'])
+     'cd to sim directory and ensure sims ran and saved to data folder.'])
 end
 
-load([pwd '/vars/sim_vars.mat'], 'namesOfNeurons','tspan','var_names','var_combos');
-load([pwd '/data/spkData.mat'],  'spkData');
+load([pwd '/vars/sim_vars.mat'],'namesOfNeurons','tspan','var_names','var_combos','perBlk','reps');
+
+SpikeData = load([pwd '/data/SpikeData1.mat']);
+SpikeData = SpikeData.SpikeData;
+
+FRData = load([pwd '/data/FRData1.mat']);
+FRData = FRData.FRData;
+
+% julia data needs to be restructured to be consistent with matlab
+% this may slow down startup only for the first time after a new simulation
+if iscell(SpikeData)
+    numBlks = ceil(length(var_combos)/perBlk);
+    for b = numBlks:-1:1
+        SpikeData = load([pwd '/data/SpikeData' num2str(b) '.mat']);
+        SpikeData = SpikeData.SpikeData;
+
+        SpikeData=[SpikeData{:}];
+        save([pwd '/data/SpikeData' num2str(b) '.mat'],'SpikeData');
+    end
+end
+
+if iscell(FRData)
+    numBlks = ceil(length(var_combos)/perBlk);
+    for b = numBlks:-1:1
+        FRData = load([pwd '/data/FRData' num2str(b) '.mat']);
+        FRData = FRData.FRData;
+
+        FRData=[FRData{:}];
+        save([pwd '/data/FRData' num2str(b) '.mat'],'FRData');
+    end
+end
 
 
 fig = uifigure;
@@ -37,7 +66,8 @@ saveBtn.Text = 'Save Plots';
 saveBtn.ButtonPushedFcn = @saveData;
 
 % tspan
-t = 0.5:1:tspan(2);
+dt=FRData(1).dt;
+t = dt/2:dt:tspan(2);
 tspanLbl = uilabel(UIgrid);
 tspanLbl.Text = 'Timespan';
 tspanLbl.HorizontalAlignment = 'right';
@@ -82,7 +112,7 @@ meant2.ValueChangedFcn = @updatePlots;
 
 % Var sliders
 for i = 1:numVars
-    var_vectors(i) = {unique(var_combos(:,i))};
+    var_vectors(i) = {unique(var_combos(:,i))}; %#ok<*AGROW>
 
     varLbl(i) = uilabel(UIgrid);
     varLbl(i).Text = var_names{i};
@@ -107,6 +137,7 @@ end
 % Raster/FR tab
 plotTabs = uitabgroup(grid1);
 plotTabs.SelectionChangedFcn = @switchTab;
+plotTabs.UserData.currSimIdx = 1;
 
 numNeurons = length(namesOfNeurons);
 [nRows, nCols] = fitPlots(numNeurons);
@@ -131,7 +162,6 @@ end
 
 
 updatePlots;
-uiwait(fig)
 
 
 % Callbacks
@@ -181,10 +211,23 @@ function sliderMoved(src,~,varDisp)
 end
 
 function updatePlots(~,~)
-    idx = find(ismember(var_combos,[varDisp(:).Value],'rows'));
+    %tic
+    simIdx = find(ismember(var_combos,[varDisp(:).Value],'rows'));
+
+    if simIdx ~= plotTabs.UserData.currSimIdx
+        if ceil(simIdx/perBlk) ~= ceil(plotTabs.UserData.currSimIdx/perBlk)
+            SpikeData = load([pwd '/data/SpikeData' num2str(ceil(simIdx/perBlk)) '.mat']);
+            SpikeData = SpikeData.SpikeData;
+            
+            FRData = load([pwd '/data/FRData' num2str(ceil(simIdx/perBlk)) '.mat']);
+            FRData = FRData.FRData;
+        end
+
+        plotTabs.UserData.currSimIdx = simIdx;
+    end
 
     for ii=1:numNeurons
-        FR = spkData(idx).FR.(namesOfNeurons{ii});
+        FR = FRData(1+mod(simIdx-1,perBlk)).FR.(namesOfNeurons{ii});
         meanFR = mean(FR(t>meant1.Value & t<meant2.Value));
 
         hold(axFR(ii),'off')
@@ -201,14 +244,22 @@ function updatePlots(~,~)
         end
 
         spks=[];
-        for trial = 1:40
-        tspks = spkData(idx).spktime.(namesOfNeurons{ii}){trial};
-        spks = [spks, [tspks';repmat(trial,1,length(tspks))]];
+
+        % if reps is high plot a subset
+        trials=reps;
+        if reps>40
+            trials = 40;
+        end
+
+        for trial = 1:trials
+            tspks = SpikeData(1+mod(simIdx-1,perBlk)).spiketimes.(namesOfNeurons{ii}){trial};
+            spks = [spks, [tspks';repmat(trial,1,length(tspks))]];
         end
 
         plot(axRasters(ii),spks(1,:),spks(2,:)-0.5,'k.','MarkerSize',8);
         xlim(axRasters(ii),[t1.Value, t2.Value]);
     end
+    %toc
 end
 
 function saveData(~,~)

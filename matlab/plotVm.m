@@ -1,14 +1,40 @@
 function plotVm
 % PLOTVM Interactive plotter for FR/Raster data from simulations
-if ~isfolder('results')
+if ~isfolder('data')
     error(['results not found in current working directory. '...
      'cd to sim directory and ensure sims ran and saved to results folder.'])
 end
 
-load([pwd '/vars/sim_vars.mat'], 'namesOfNeurons','tspan','var_names','var_combos','perBlock');
+load([pwd '/vars/sim_vars.mat'],'namesOfNeurons','tspan','dt','var_names','var_combos','perBlk','reps');
 
-load([pwd '/results/simResults1.mat'], 'simResults');
+% check if sim data came from julia
+if any(size(dir('*.jl'),1))
+    datapath  = '/results/VmData';
+    datafield = 'VmData';    
+else
+    datapath = '/results/simResults';
+    datafield= 'simResults';
+end
 
+simResults = load([pwd datapath '1.mat']);
+simResults = simResults.(datafield);
+
+% julia data needs to be restructured to be consistent with matlab
+% this may slow down startup only for the first time after a new simulation
+if iscell(simResults)
+    numBlks = ceil(length(var_combos)/perBlk);
+    for b = 1:numBlks
+        VmData = load([pwd datapath num2str(b) '.mat']);
+        VmData = VmData.(datafield);
+
+        VmData=[VmData{:}];
+        save([pwd datapath num2str(b) '.mat'],'VmData');
+    end
+    clear("VmData")
+
+    simResults = load([pwd datapath '1.mat']);
+    simResults = simResults.(datafield);
+end
 
 fig = uifigure;
 fig.Name = "Plot Vm Data";
@@ -34,6 +60,7 @@ saveBtn.Text = 'Save Plots';
 saveBtn.ButtonPushedFcn = @saveData;
 
 % tspan
+time = tspan(1):dt:tspan(2);
 tspanLbl = uilabel(UIgrid);
 tspanLbl.Text = 'Timespan';
 tspanLbl.HorizontalAlignment = 'right';
@@ -55,7 +82,7 @@ t2.ValueChangedFcn = @updatePlots;
 
 % Var sliders
 for i = 1:numVars
-    var_vectors(i) = {unique(var_combos(:,i))};
+    var_vectors(i) = {unique(var_combos(:,i))}; %#ok<*AGROW>
 
     varLbl(i) = uilabel(UIgrid);
     varLbl(i).Text = var_names{i};
@@ -76,6 +103,28 @@ for i = 1:numVars
     rb(i).ButtonPushedFcn = {@sliderMoved, varDisp(i)};
 end
 
+% Rep slider
+if reps>1
+    rep_vectors = {1:reps};
+
+    repLbl = uilabel(UIgrid);
+    repLbl.Text = 'replicate';
+    repLbl.HorizontalAlignment = 'right';
+    
+    rep_lb = uibutton(UIgrid);
+    rep_lb.Text = '<-';
+    
+    repDisp = uieditfield(UIgrid,'numeric');
+    repDisp.Value = rep_vectors{1}(1);
+    repDisp.UserData = struct('vars',rep_vectors(1),'currIdx',1);
+    repDisp.Editable = 'off';
+    
+    rep_rb = uibutton(UIgrid);
+    rep_rb.Text = '->';
+    
+    rep_lb.ButtonPushedFcn = {@sliderMoved, repDisp};
+    rep_rb.ButtonPushedFcn = {@sliderMoved, repDisp};
+end
 
 % Vm plots
 numNeurons = length(namesOfNeurons);
@@ -91,7 +140,7 @@ end
 
 
 updatePlots;
-uiwait(fig)
+
 
 % Callbacks
 function sliderMoved(src,~,varDisp)
@@ -126,17 +175,21 @@ function updatePlots(~,~)
     simIdx = find(ismember(var_combos,[varDisp(:).Value],'rows'));
 
     if simIdx ~= plotGrid.UserData.currSimIdx
-        if ceil(simIdx/perBlock) ~= ceil(plotGrid.UserData.currSimIdx/perBlock)
-            load([pwd '/results/simResults' num2str(ceil(simIdx/perBlock)) '.mat'], 'simResults');
+        if ceil(simIdx/perBlk) ~= ceil(plotGrid.UserData.currSimIdx/perBlk)
+            simResults = load([pwd datapath num2str(ceil(simIdx/perBlk)) '.mat']);
+            simResults = simResults.(datafield);
         end
 
         plotGrid.UserData.currSimIdx = simIdx;
     end
 
-    t = simResults(1+mod(simIdx-1,perBlock)).data.time;
     for ii=1:numNeurons
-        vm = simResults(1+mod(simIdx-1,perBlock)).data.(namesOfNeurons{ii});
-        plot(ax(ii),t,vm);
+        if reps>1
+            vm = simResults(repDisp.Value).data.(namesOfNeurons{ii});
+        else
+            vm = simResults(1+mod(simIdx-1,perBlk)).data.(namesOfNeurons{ii});
+        end
+        plot(ax(ii),time,vm);
         xlim(ax(ii),[t1.Value, t2.Value]);
         ylim(ax(ii),[-100, 50]);
     end

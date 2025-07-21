@@ -13,12 +13,16 @@ if ~isfolder('data')
     mkdir data
 end
 
+rep_idx = find(var_names=="reps");
 
 numCells = length(namesOfNeurons);
-n_trials = length(unique(var_combos(:,1)));
+n_trials = length(unique(var_combos(:,rep_idx))); %#ok<*FNDSB>
 n_totalVars = length(unique(var_combos(:,2:end),'rows'));
 
-spkData = struct('spktime', [],'FR', []);
+dt = 1;
+
+spikeData = struct('spiketimes', []);
+FRData = struct('dt', [], 'FR', []);
 
 for x=1:n_totalVars
 simResults = load([pwd '/results/simResults' num2str(x) '.mat']).simResults;
@@ -32,19 +36,19 @@ for n=1:numCells
 
         [~, loc] = findpeaks(vm, t, 'MinPeakProminence', 50);
 
-        spks{i} = loc;
+        spks{i} = loc; %#ok<*AGROW>
         total_spks = [total_spks; spks{i}];
     end
 
-    spkData(x).spktime.(namesOfNeurons{n}) = spks;
+    spikeData(x).spiketimes.(namesOfNeurons{n}) = spks;
 
-    [psth, centers] = return_histogram(total_spks, tspan(2), n_trials, 31);
+    [psth, ~] = return_histogram(total_spks, tspan(2), dt, n_trials, 31);
 
-    spkData(x).FR.time = centers;
-    spkData(x).FR.(namesOfNeurons{n}) = psth.*1000;
+    FRData(x).dt = dt;
+    FRData(x).FR.(namesOfNeurons{n}) = psth.*1000;
 end
 end
 
-save([pwd '/data/spkData.mat'],'spkData')
+save([pwd '/data/spkData.mat'],'spikeData')
 
 end %main

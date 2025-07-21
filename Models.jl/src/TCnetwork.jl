@@ -1,8 +1,11 @@
 
-@kwdef mutable struct TRNnetwork <: Model
+@kwdef mutable struct TCnetwork <: Model
     names::Vector{String}
     n::Int          = length(names)
-    per_neuron::Int = 14
+    nTRN::Int       = sum(startswith.(names,"TRN"))
+    nTC::Int        = sum(startswith.(names,"TC"))
+	nCTX::Int       = sum(startswith.(names,"CTX"))
+    per_neuron::Int = 14+div(n,2)
 
     # channel conductance (mS/cm^2)
     g_cat::Vector{Float64} = fill( 0.75 ,n)
@@ -55,12 +58,16 @@
     AI::Vector{Vector{Float64}}  = fill([0.0],n)
     tAI::Vector{Vector{Float64}} = fill([0.0],n)
 
+    A_TC_TRN::Matrix{Float64}   = zeros(nTC,nTRN)
+    A_TC_CTX::Matrix{Float64}   = zeros(nTC,nCTX)
+    AI_TRN_TC::Matrix{Float64}  = zeros(nTRN,nTC)
+
     # Electrical Synapses (mS/cm^2)
     GJ::Matrix{Float64} = zeros(n,n)
 end
 
 
-function dsim!(du, u, p::TRNnetwork, t)
+function dsim!(du, u, p::TCnetwork, t)
     for i = 1:p.n
         idx = p.per_neuron*(i-1)
         v, m_nat, h_nat, m_nap, m_kd, m_kt, h_kt, m_k2, h_k2, m_cat, h_cat, m_ar = @view u[idx+1:idx+12]
@@ -105,15 +112,42 @@ function dsim!(du, u, p::TRNnetwork, t)
 
         # Synapses
         ## Excitatory input
-        du[idx+13] = p.t_rise*k_syn(vpre)*(1.0-u[idx+13]) - p.t_fall*u[idx+13]
+        du[idx+13] = p.t_rise * k_syn(vpre)*(1.0-u[idx+13]) -
+            p.t_fall*u[idx+13]
         I += A*u[idx+13] * (v-p.E_AMPA)
 
         ## Inhibitory input
-        du[idx+14] = p.t_inh_rise*k_syn(vpreI)*(1.0-u[idx+14]) - p.t_inh_fall*u[idx+14]
+        du[idx+14] = p.t_inh_rise * k_syn(vpreI)*(1.0-u[idx+14]) -
+            p.t_inh_fall*u[idx+14]
         I += AI*u[idx+14] * (v-p.E_GABA)
 
-        ## Electrical synapses
-        I += gsyn_func(v,u[1:p.per_neuron:end],p.GJ[:,i])
+        if startswith(p.names[i],"TRN")
+            ## Excitatory input TC
+            for ii=1:p.nTC
+                du[idx+14+ii] = p.t_rise * k_syn(u[p.per_neuron*(ii+p.nTC-1)+1]) *
+                    (1.0-u[idx+14+ii]) - p.t_fall*u[idx+14+ii]
+                I += p.A_TC_TRN[ii,i]*u[idx+14+ii] * (v-p.E_AMPA)
+            end
+
+            ## Electrical synapses TRN
+            I += gsyn_func(v,u[1:p.per_neuron:p.nTRN*p.per_neuron],p.GJ[:,i])
+
+        elseif startswith(p.names[i],"CTX")
+            ## Excitatory input TC
+            for ii=1:p.nTC
+                du[idx+14+ii] = p.t_rise * k_syn(u[p.per_neuron*(ii+p.nTC-1)+1]) *
+                    (1.0-u[idx+14+ii]) - p.t_fall*u[idx+14+ii]
+                I += p.A_TC_CTX[ii,i-(p.nTRN+p.nTC)]*u[idx+14+ii] * (v-p.E_AMPA)
+            end
+
+        else #TC
+            ## Inhibitory input TRN
+            for ii=1:p.nTRN
+                du[idx+14+ii] = p.t_inh_rise * k_syn(u[p.per_neuron*(ii-1)+1]) *
+                    (1.0-u[idx+14+ii]) - p.t_inh_fall*u[idx+14+ii]
+                I += p.AI_TRN_TC[ii,i-p.nTRN]*u[idx+14+ii] * (v-p.E_GABA)
+            end
+        end
     
         # Final equations
         du[idx+1]  = (-1.0/p.C)*I
@@ -133,7 +167,7 @@ function dsim!(du, u, p::TRNnetwork, t)
     return nothing
 end
 
-function initialconditions(p::TRNnetwork; vm::Number = -72.8)
+function initialconditions(p::TCnetwork; vm::Number = -72.8)
     u_init = [vm,
         minf_nat(vm),
         hinf_nat(vm),
@@ -149,6 +183,8 @@ function initialconditions(p::TRNnetwork; vm::Number = -72.8)
         0.0,
         0.0
     ]
+
+    u_init = [u_init; zeros(div(p.n,2))]
 
     u0 = repeat(u_init, p.n)
 
