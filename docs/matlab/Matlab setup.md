@@ -18,7 +18,6 @@ Signal Processing
 
 Statistics and Machine Learning
 
-Symbolic Math
 
 # Post install
 

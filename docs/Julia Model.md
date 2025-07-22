@@ -1,26 +1,19 @@
 
-Model code is organized into modules:
-# Models
+Model code is organized into structures with the following parameters:
 
-## Channels
+# TRNmodel
 
-## Synapses
+[TRN model](TRN%20model.md) ->
+This is the base TRN cell model with only external synapses
 
-## common functions
+# TRNnetwork
 
-
-## TRNmodel
-[TRNmodel](TRNmodel.md)
-This is the base TRN cell model with no synapses
-[TRNmodel](TRNmodel.jl)
-
-## TRNnetwork
-
+[TRN network](TRN%20network.md) ->
 TRN model with external synapses as well as GJs between TRNs
 
+# TCnetwork
 
-## TC_TRNnetwork
-
-TC-TRN columns with connectivity between layers and GJs between TRNs 
+[TC network](TC%20network.md) ->
+TC-TRN-CTX model with connectivity between layers and GJs between TRNs 
 
 

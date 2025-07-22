@@ -1,13 +1,13 @@
 
 # Import packages
 using Models
-# using Random
 
 # create neurons
-params = TRNmodel(names = ["TRN1"])
-
-# parameters could be modified here for all simulations
-# params.g_cat = [0.0 for i in params.n]
+params = TRNmodel( 
+    names = ["TRN1"]
+    # parameters could be modified here for all simulations
+    # g_cat = [0.0]
+)
 
 # setup vars
 var_names = ["A", "B"]
@@ -38,13 +38,12 @@ function param_function(params::Model, var_combo::Tuple)
     return p
 end
 
-# begin running sims, data will be saved to /data
-# by default only spike times saved.
-# A progress bar will also be visible from the terminal,
+# begin running sims, model code may need to be precompiled on first execution.
+# data folders will also be created, once the simulations start 
+# a progress bar will be visible from the terminal.
 # if the process crashes for any reason simply re-run this script
 # and the program will detect and resume from the saved data. 
 runsim(params, vars, param_function,
     # optionally, save all vm data
     save_vm = true,
 )
-

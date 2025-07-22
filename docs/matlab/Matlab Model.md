@@ -1,6 +1,6 @@
 # Model usage
 
-If matlab hasnt been installed follow the setup -> [Here](Matlab%20setup.md)
+If matlab hasn't been installed follow the setup -> [Here](Matlab%20setup.md)
 
 Open matlab and add the 'matlab/model/common_files' folder to the search path 
 
