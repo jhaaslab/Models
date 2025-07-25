@@ -51,7 +51,7 @@ construct_syn_net(num_src, num_tgt,
 
 Inputs are:
 - size of source neuron network
-- size of target neuron network
+- size of target neuron network, if sizes are equal this can be excluded.
 - probability of forming reciprocal synapse (between same numbered pairs)
 - probability of divergent synapse (across pair connectivity)
 - mean strength of synapses

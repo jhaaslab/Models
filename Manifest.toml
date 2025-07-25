@@ -1520,7 +1520,7 @@ version = "1.11.0"
 deps = ["DSP", "JLD2", "LinearAlgebra", "MAT", "NaNStatistics", "OrdinaryDiffEq", "Peaks", "ProgressMeter", "Random", "Statistics"]
 path = "Models.jl"
 uuid = "d93e516b-cdf6-4941-872b-0848ac9e8f65"
-version = "2.0.0"
+version = "2.0.1"
 
 [[deps.ModernGL]]
 deps = ["Libdl"]

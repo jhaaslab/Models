@@ -28,34 +28,40 @@ function construct_gj_net(num_TRN::Int; mean_gc::Float64, sigma_gc::Float64=0.0,
         error("Smaller sigma value needed to prevent negative amplitude values")
     end
 
-    gjMat=zeros(num_TRN,num_TRN)
+    gjMat = zeros(num_TRN,num_TRN)
+    
     for i in randperm(num_TRN)
-        r=rand()
+        r = rand()
+        
         if r>=0.95
-            numGJ=3
+            numGJ = 3
         elseif r>0.45 && r<0.95
-            numGJ=2
+            numGJ = 2
         elseif r<=0.45
-            numGJ=1
+            numGJ = 1
         end
 
-        numGJ=numGJ-Int(sum(gjMat[:,i]))
+        numGJ = numGJ-Int(sum(gjMat[:,i]))
+        
         if numGJ<0
             numGJ=0
         end
 
-        r2=rand(num_TRN)
-        for ii=1:num_TRN
+        r2 = rand(num_TRN)
+        
+        for ii in 1:num_TRN
             if gjMat[i,ii]==1 || sum(gjMat[:,ii])>=3
-                r2[ii]=0
+                r2[ii] = 0
             end
             if sum(gjMat[:,ii])==0
-                r2[ii]+=0.2
+                r2[ii] += 0.2
             end
         end
-        r2[i]=0
+        
+        r2[i] = 0
 
-        idx=partialsortperm(r2, 1:numGJ, rev=true)
+        idx = partialsortperm(r2, 1:numGJ, rev=true)
+        
         gjMat[i,idx].=1
 
         gjMat = gjMat+gjMat'
@@ -64,14 +70,14 @@ function construct_gj_net(num_TRN::Int; mean_gc::Float64, sigma_gc::Float64=0.0,
 
     gjMat = UpperTriangular(gjMat)
 
-    gcMat = sigma_gc.*randn(size(gjMat)).+mean_gc
+    gcMat = sigma_gc .* randn(size(gjMat)) .+ mean_gc
     gcMat[gcMat.<0.0].=0.0
 
-    gcMat = gjMat.*gcMat
-    gcMat = gcMat+gcMat'
+    gcMat = gjMat .* gcMat
+    gcMat = gcMat + gcMat'
 
     if normalize == "none"
-        gjMat=gcMat
+        gjMat = gcMat
         
     elseif normalize == "per-cell"
         gjMat = gjMat+gjMat'
@@ -89,7 +95,8 @@ function construct_gj_net(num_TRN::Int; mean_gc::Float64, sigma_gc::Float64=0.0,
     return gjMat
 end
 
-function construct_syn_net(num_pairs::Int; recip_prob::Float64, div_prob::Float64,
+function construct_syn_net(num_src::Int, num_tgt::Int=num_src;
+    recip_prob::Float64, div_prob::Float64,
     mean::Float64, sigma::Float64=0.0, normalize::String="none")
     # generate random synapses between TRN-TC networks
     # Each possible location has prob of occuring, with recip_prob and
@@ -101,18 +108,23 @@ function construct_syn_net(num_pairs::Int; recip_prob::Float64, div_prob::Float6
         error("Smaller sigma value needed to prevent negative amplitude values")
     end
 
-    connMat = zeros(num_pairs,num_pairs)
-    R = rand(num_pairs,num_pairs)
+    connMat = zeros(num_src,num_tgt)
+    R = rand(size(connMat)...)
 
-    recipMat = Diagonal(R)
-    recipMat = recipMat.>1-recip_prob
+    recipMat = copy(R)
+    recip_idxs = diagind(R)
 
-    divMat = R-Diagonal(R)
-    divMat = divMat.>1-div_prob
+    R[recip_idxs].=0.0
 
-    connMat = recipMat.+divMat
+    divMat   = R
+    recipMat = recipMat-R
+    
+    recipMat = recipMat .> 1-recip_prob
+    divMat   = divMat   .> 1-div_prob
 
-    ampMat = sigma.*randn(size(connMat)).+ mean
+    connMat = recipMat .+ divMat
+
+    ampMat = sigma .* randn(size(connMat)) .+ mean
     ampMat[ampMat.<0.0].=0.0
 
     if normalize == "none"
