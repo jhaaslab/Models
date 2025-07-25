@@ -85,6 +85,9 @@ Open matlab and add the 'matlab' folder to matlabs search path, subfolders not n
 
 Creating sim run scripts -> [Run Script](docs/Run%20Script.md)
 
+## Pluto Notebooks
+
+Live notebooks for the models are included, for running them follow setup and instructions here -> [Pluto notebooks](docs/Pluto%20notebooks.md)
 
 ## Model Documentation
 

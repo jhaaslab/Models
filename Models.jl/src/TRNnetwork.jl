@@ -134,7 +134,8 @@ function dsim!(du, u, p::TRNnetwork, t)
 end
 
 function initialconditions(p::TRNnetwork; vm::Number = -72.8)
-    u_init = [vm,
+    u_init = [
+        vm,
         minf_nat(vm),
         hinf_nat(vm),
         minf_nap(vm),
